@@ -457,20 +457,7 @@ function initHeroScrub() {
  * Interactive Expandable Drawers (Firm Overview, Practices, Advocates)
  */
 function initDrawers() {
-  // 1. The Firm Doctrine Expand
-  document.querySelectorAll('.btn-firm-expand').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const targetSelector = btn.getAttribute('data-target');
-      const drawer = document.querySelector(targetSelector);
-      if (!drawer) return;
-      const isOpen = drawer.classList.contains('open');
-      drawer.classList.toggle('open', !isOpen);
-      btn.classList.toggle('active', !isOpen);
-      btn.setAttribute('aria-expanded', !isOpen);
-    });
-  });
-
-  // 2. Practice Disciplines Catalogue Toggle
+  // 1. Practice Disciplines Catalogue Toggle
   document.querySelectorAll('.btn-catalogue-toggle').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetSelector = btn.getAttribute('data-target');
@@ -483,7 +470,7 @@ function initDrawers() {
     });
   });
 
-  // 3. Advocates Background Details Toggle
+  // 2. Advocates Background Details Toggle
   document.querySelectorAll('.btn-advocate-details').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetSelector = btn.getAttribute('data-target');
@@ -746,91 +733,7 @@ function initEditorialScrollReveals() {
     }
   }
 
-  // 4. The Firm Section (#the-firm)
-  const firmSection = document.getElementById('the-firm');
-  if (firmSection) {
-    const firmLines = firmSection.querySelectorAll('.editorial-split-header .reveal-line');
-    const firmParas = firmSection.querySelectorAll('.firm-narrative-col .reveal-paragraph');
-    const firmExpand = firmSection.querySelector('.firm-expandable-box');
-    const firmSlate = firmSection.querySelector('.parameters-slate');
-
-    const firmTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: firmSection,
-        start: 'top 80%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
-      }
-    });
-
-    firmTl.fromTo(firmLines,
-      { y: '115%', opacity: 0 },
-      { y: '0%', opacity: 1, duration: 0.85, stagger: 0.1, ease: 'power3.out' }
-    );
-    if (firmParas.length) {
-      firmTl.fromTo(firmParas,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' },
-        '-=0.3'
-      );
-    }
-    if (firmSlate) {
-      firmTl.fromTo(firmSlate,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.52, ease: 'power2.out' },
-        '<+=0.1'
-      );
-    }
-    if (firmExpand) {
-      firmTl.fromTo(firmExpand,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
-        '<+=0.15'
-      );
-    }
-  }
-
-  // Colonnade subtle scroll parallax
-  const perspectiveImg = document.getElementById('perspective-parallax-img');
-  if (perspectiveImg) {
-    gsap.fromTo(perspectiveImg,
-      { scale: 1.0, y: -25 },
-      {
-        scale: 1.06,
-        y: 25,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#chambers-perspective',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
-  }
-
-  // Profile Band Items (#firm-profile)
-  const profileBand = document.getElementById('firm-profile');
-  if (profileBand) {
-    gsap.fromTo('.profile-band-item',
-      { opacity: 0, y: 18 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.45,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: profileBand,
-          start: 'top 85%',
-          end: 'bottom 10%',
-          toggleActions: 'play reverse play reverse'
-        }
-      }
-    );
-  }
-
-  // 5. Litigation Doctrine Section (#approach)
+  // 4. Litigation Doctrine Section (#approach)
   const doctrineSection = document.getElementById('approach');
   if (doctrineSection) {
     const dEyebrow = doctrineSection.querySelector('.eyebrow-tag');
@@ -875,7 +778,7 @@ function initEditorialScrollReveals() {
     }
   }
 
-  // 6. Contact Section (#consultation)
+  // 5. Contact Section (#consultation)
   const contactSection = document.getElementById('consultation');
   if (contactSection) {
     const cLines = contactSection.querySelectorAll('.editorial-main-heading .reveal-line');
