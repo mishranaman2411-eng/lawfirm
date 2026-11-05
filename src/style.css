@@ -1179,6 +1179,104 @@ button {
 }
 
 /* ==========================================================================
+   FIRM STATISTICS (METRICS & TRACK RECORD)
+   ========================================================================== */
+.section-statistics {
+  background: var(--espresso);
+  color: var(--ivory);
+  padding: 6rem 0;
+  position: relative;
+  border-top: 1px solid rgba(230, 224, 213, 0.08);
+  border-bottom: 1px solid rgba(230, 224, 213, 0.08);
+}
+
+.stats-intro-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--taupe-light);
+  margin-top: 1rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin-top: 3.5rem;
+}
+
+.stat-card {
+  padding: 2.2rem 1.8rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(230, 224, 213, 0.08);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(230, 224, 213, 0.2);
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 3.5vw, 3rem);
+  font-weight: 700;
+  color: var(--ivory);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.stat-value-placeholder {
+  color: var(--taupe-light);
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: var(--ivory);
+  margin-bottom: 0.5rem;
+  line-height: 1.35;
+}
+
+.stat-desc {
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--taupe-light);
+}
+
+.stats-disclaimer {
+  margin-top: 2.5rem;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--taupe);
+  text-align: center;
+  max-width: 72ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+/* ==========================================================================
    SECTION 3: OUR APPROACH / LITIGATION DOCTRINE (DEEP ESPRESSO)
    ========================================================================== */
 .approach-lead-text {

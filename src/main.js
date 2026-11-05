@@ -561,139 +561,51 @@ function initSmoothScroll() {
  * Naturally reverses when scrolling upward.
  */
 function initEditorialScrollReveals() {
-  // 1. Chambers Perspective Section (#chambers-perspective)
-  const perspHeader = document.querySelector('#chambers-perspective .perspective-editorial-header');
-  if (perspHeader) {
-    const lines = perspHeader.querySelectorAll('.reveal-line');
-    const para = perspHeader.querySelector('.perspective-body');
-    const perspTl = gsap.timeline({
+  // 1. Advocates Section (#advocates) - Immediately after Hero
+  const advocatesSection = document.getElementById('advocates');
+  if (advocatesSection) {
+    const advLines = advocatesSection.querySelectorAll('.editorial-main-heading .reveal-line');
+    const advIntro = advocatesSection.querySelector('.firm-paragraph-lead');
+    const advCards = advocatesSection.querySelectorAll('.advocate-profile-card');
+
+    const advTl = gsap.timeline({
       scrollTrigger: {
-        trigger: perspHeader,
-        start: 'top 85%',
+        trigger: advocatesSection,
+        start: 'top 80%',
         end: 'bottom 10%',
         toggleActions: 'play reverse play reverse'
       }
     });
 
-    perspTl.fromTo(lines,
-      { y: '115%' },
-      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
-    );
-    if (para) {
-      perspTl.fromTo(para,
+    if (advLines.length) {
+      advTl.fromTo(
+        advLines,
+        { y: '115%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.85, ease: 'power3.out' }
+      );
+    }
+    if (advIntro) {
+      advTl.fromTo(
+        advIntro,
         { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
-        '-=0.25'
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+        '-=0.4'
       );
+    }
+    if (advCards.length) {
+      advCards.forEach((card, idx) => {
+        const content = card.querySelector('.advocate-card-content') || card;
+        advTl.fromTo(
+          content,
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out' },
+          idx === 0 ? '-=0.15' : '-=0.45'
+        );
+      });
     }
   }
 
-  // Perspective colonnade subtle scroll parallax
-  const perspectiveImg = document.getElementById('perspective-parallax-img');
-  if (perspectiveImg) {
-    gsap.fromTo(perspectiveImg,
-      { scale: 1.0, y: -25 },
-      {
-        scale: 1.06,
-        y: 25,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '#chambers-perspective',
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: true
-        }
-      }
-    );
-  }
-
-  // Perspective Quote Statement
-  const callout = document.querySelector('.perspective-callout');
-  if (callout) {
-    gsap.fromTo('.callout-statement',
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: callout,
-          start: 'top 85%',
-          end: 'bottom 10%',
-          toggleActions: 'play reverse play reverse'
-        }
-      }
-    );
-  }
-
-  // 2. Profile Band Items (#firm-profile): Staggered numbered items
-  const profileBand = document.getElementById('firm-profile');
-  if (profileBand) {
-    gsap.fromTo('.profile-band-item',
-      { opacity: 0, y: 18 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.45,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: profileBand,
-          start: 'top 85%',
-          end: 'bottom 10%',
-          toggleActions: 'play reverse play reverse'
-        }
-      }
-    );
-  }
-
-  // 3. The Firm Section (#the-firm): Line-by-line heading + intro paragraphs + concurrent slate
-  const firmSection = document.getElementById('the-firm');
-  if (firmSection) {
-    const firmLines = firmSection.querySelectorAll('.editorial-split-header .reveal-line');
-    const firmParas = firmSection.querySelectorAll('.firm-narrative-col .reveal-paragraph');
-    const firmExpand = firmSection.querySelector('.firm-expandable-box');
-    const firmSlate = firmSection.querySelector('.parameters-slate');
-
-    const firmTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: firmSection,
-        start: 'top 82%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
-      }
-    });
-
-    firmTl.fromTo(firmLines,
-      { y: '115%' },
-      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
-    );
-    if (firmParas.length) {
-      firmTl.fromTo(firmParas,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.45, stagger: 0.06, ease: 'power2.out' },
-        '-=0.25'
-      );
-    }
-    if (firmSlate) {
-      firmTl.fromTo(firmSlate,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.48, ease: 'power2.out' },
-        '<+=0.1'
-      );
-    }
-    if (firmExpand) {
-      firmTl.fromTo(firmExpand,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
-        '<+=0.15'
-      );
-    }
-  }
-
-  // 4. Practice Areas Section (#practice-areas)
-  // Heading reveal
+  // 2. Practice Areas Section (#practice-areas)
   const practiceHeading = document.querySelector('#practice-areas .editorial-main-heading');
   if (practiceHeading) {
     const practiceLines = practiceHeading.querySelectorAll('.reveal-line');
@@ -716,7 +628,6 @@ function initEditorialScrollReveals() {
     );
   }
 
-  // Introductory paragraph fade and rise
   const practiceDesc = document.querySelector('#practice-areas .practice-intro-desc');
   if (practiceDesc) {
     gsap.fromTo(
@@ -737,7 +648,7 @@ function initEditorialScrollReveals() {
     );
   }
 
-  // Existing Item 1 ("Commercial Litigation") title and description together
+  // Item 1 ("Commercial Litigation") title and description together
   const firstItem = document.querySelector('#practice-item-1');
   if (firstItem) {
     const itemContent = firstItem.querySelector('.catalogue-text-content');
@@ -794,6 +705,131 @@ function initEditorialScrollReveals() {
     );
   });
 
+  // 3. Firm Statistics Section (#firm-statistics)
+  const statsSection = document.getElementById('firm-statistics');
+  if (statsSection) {
+    const sLines = statsSection.querySelectorAll('.reveal-line');
+    const sDesc = statsSection.querySelector('.stats-intro-desc');
+    const sCards = statsSection.querySelectorAll('.stat-card');
+
+    const statsTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: statsSection,
+        start: 'top 80%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    if (sLines.length) {
+      statsTl.fromTo(
+        sLines,
+        { y: '115%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.85, stagger: 0.12, ease: 'power3.out' }
+      );
+    }
+    if (sDesc) {
+      statsTl.fromTo(
+        sDesc,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+        '-=0.4'
+      );
+    }
+    if (sCards.length) {
+      statsTl.fromTo(
+        sCards,
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
+        '-=0.2'
+      );
+    }
+  }
+
+  // 4. The Firm Section (#the-firm)
+  const firmSection = document.getElementById('the-firm');
+  if (firmSection) {
+    const firmLines = firmSection.querySelectorAll('.editorial-split-header .reveal-line');
+    const firmParas = firmSection.querySelectorAll('.firm-narrative-col .reveal-paragraph');
+    const firmExpand = firmSection.querySelector('.firm-expandable-box');
+    const firmSlate = firmSection.querySelector('.parameters-slate');
+
+    const firmTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: firmSection,
+        start: 'top 80%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    firmTl.fromTo(firmLines,
+      { y: '115%', opacity: 0 },
+      { y: '0%', opacity: 1, duration: 0.85, stagger: 0.1, ease: 'power3.out' }
+    );
+    if (firmParas.length) {
+      firmTl.fromTo(firmParas,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' },
+        '-=0.3'
+      );
+    }
+    if (firmSlate) {
+      firmTl.fromTo(firmSlate,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.52, ease: 'power2.out' },
+        '<+=0.1'
+      );
+    }
+    if (firmExpand) {
+      firmTl.fromTo(firmExpand,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+        '<+=0.15'
+      );
+    }
+  }
+
+  // Colonnade subtle scroll parallax
+  const perspectiveImg = document.getElementById('perspective-parallax-img');
+  if (perspectiveImg) {
+    gsap.fromTo(perspectiveImg,
+      { scale: 1.0, y: -25 },
+      {
+        scale: 1.06,
+        y: 25,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#chambers-perspective',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+  }
+
+  // Profile Band Items (#firm-profile)
+  const profileBand = document.getElementById('firm-profile');
+  if (profileBand) {
+    gsap.fromTo('.profile-band-item',
+      { opacity: 0, y: 18 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        stagger: 0.08,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: profileBand,
+          start: 'top 85%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  }
+
   // 5. Litigation Doctrine Section (#approach)
   const doctrineSection = document.getElementById('approach');
   if (doctrineSection) {
@@ -839,51 +875,7 @@ function initEditorialScrollReveals() {
     }
   }
 
-  // 6. Advocates Section (#advocates)
-  const advocatesSection = document.getElementById('advocates');
-  if (advocatesSection) {
-    const advLines = advocatesSection.querySelectorAll('.editorial-main-heading .reveal-line');
-    const advIntro = advocatesSection.querySelector('.firm-paragraph-lead');
-    const advCards = advocatesSection.querySelectorAll('.advocate-profile-card');
-
-    const advTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: advocatesSection,
-        start: 'top 80%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
-      }
-    });
-
-    if (advLines.length) {
-      advTl.fromTo(
-        advLines,
-        { y: '115%', opacity: 0 },
-        { y: '0%', opacity: 1, duration: 0.85, ease: 'power3.out' }
-      );
-    }
-    if (advIntro) {
-      advTl.fromTo(
-        advIntro,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
-        '-=0.4'
-      );
-    }
-    if (advCards.length) {
-      advCards.forEach((card, idx) => {
-        const content = card.querySelector('.advocate-card-content') || card;
-        advTl.fromTo(
-          content,
-          { opacity: 0, y: 22 },
-          { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out' },
-          idx === 0 ? '-=0.15' : '-=0.45'
-        );
-      });
-    }
-  }
-
-  // 7. Contact Section (#consultation)
+  // 6. Contact Section (#consultation)
   const contactSection = document.getElementById('consultation');
   if (contactSection) {
     const cLines = contactSection.querySelectorAll('.editorial-main-heading .reveal-line');
