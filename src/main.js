@@ -480,8 +480,6 @@ function initDrawers() {
       drawer.classList.toggle('open', !isOpen);
       btn.classList.toggle('active', !isOpen);
       btn.setAttribute('aria-expanded', !isOpen);
-      const text = btn.querySelector('.toggle-text');
-      if (text) text.textContent = isOpen ? 'Examine Practice Scope' : 'Close Practice Scope';
     });
   });
 
@@ -495,8 +493,6 @@ function initDrawers() {
       drawer.classList.toggle('open', !isOpen);
       btn.classList.toggle('active', !isOpen);
       btn.setAttribute('aria-expanded', !isOpen);
-      const text = btn.querySelector('.btn-adv-text');
-      if (text) text.textContent = isOpen ? 'View Professional Background' : 'Hide Professional Background';
     });
   });
 }
@@ -558,10 +554,41 @@ function initSmoothScroll() {
 }
 
 /**
- * Subtle GSAP ScrollTrigger Editorial Reveals
+ * GSAP ScrollTrigger Text & Editorial Reveals
+ * Implements line-by-line heading reveal from invisible clipping masks,
+ * immediate introductory paragraph transitions, numbered item staggers,
+ * sequenced practice discipline reveals, and advocate portrait-to-credentials reveal.
+ * Naturally reverses when scrolling upward.
  */
 function initEditorialScrollReveals() {
-  // 0. Chambers Perspective Parallax and Content Reveal
+  // 1. Chambers Perspective Section (#chambers-perspective)
+  const perspHeader = document.querySelector('#chambers-perspective .perspective-editorial-header');
+  if (perspHeader) {
+    const lines = perspHeader.querySelectorAll('.reveal-line');
+    const para = perspHeader.querySelector('.perspective-body');
+    const perspTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: perspHeader,
+        start: 'top 85%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    perspTl.fromTo(lines,
+      { y: '115%' },
+      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
+    );
+    if (para) {
+      perspTl.fromTo(para,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+        '-=0.25'
+      );
+    }
+  }
+
+  // Perspective colonnade subtle scroll parallax
   const perspectiveImg = document.getElementById('perspective-parallax-img');
   if (perspectiveImg) {
     gsap.fromTo(perspectiveImg,
@@ -580,91 +607,311 @@ function initEditorialScrollReveals() {
     );
   }
 
-  gsap.from('.perspective-editorial-header', {
-    scrollTrigger: {
-      trigger: '.perspective-editorial-header',
-      start: 'top 85%',
-      toggleActions: 'play none none none'
-    },
-    opacity: 0,
-    y: 30,
-    duration: 0.75,
-    ease: 'power2.out'
-  });
+  // Perspective Quote Statement
+  const callout = document.querySelector('.perspective-callout');
+  if (callout) {
+    gsap.fromTo('.callout-statement',
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: callout,
+          start: 'top 85%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  }
 
-  gsap.from('.perspective-callout', {
-    scrollTrigger: {
-      trigger: '.perspective-callout',
-      start: 'top 85%',
-      toggleActions: 'play none none none'
-    },
-    opacity: 0,
-    y: 25,
-    duration: 0.75,
-    ease: 'power2.out'
-  });
+  // 2. Profile Band Items (#firm-profile): Staggered numbered items
+  const profileBand = document.getElementById('firm-profile');
+  if (profileBand) {
+    gsap.fromTo('.profile-band-item',
+      { opacity: 0, y: 18 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        stagger: 0.08,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: profileBand,
+          start: 'top 85%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  }
 
-  // 1. Profile Band Items
-  gsap.utils.toArray('.profile-band-item').forEach((item, i) => {
-    gsap.from(item, {
+  // 3. The Firm Section (#the-firm): Line-by-line heading + intro paragraphs + concurrent slate
+  const firmSection = document.getElementById('the-firm');
+  if (firmSection) {
+    const firmLines = firmSection.querySelectorAll('.editorial-split-header .reveal-line');
+    const firmParas = firmSection.querySelectorAll('.firm-narrative-col .reveal-paragraph');
+    const firmExpand = firmSection.querySelector('.firm-expandable-box');
+    const firmSlate = firmSection.querySelector('.parameters-slate');
+
+    const firmTl = gsap.timeline({
       scrollTrigger: {
-        trigger: item,
-        start: 'top 88%',
-        toggleActions: 'play none none none'
-      },
-      opacity: 0,
-      y: 20,
-      duration: 0.6,
-      delay: i * 0.1,
-      ease: 'power2.out'
+        trigger: firmSection,
+        start: 'top 82%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
     });
-  });
 
-  // 2. Practice Catalogue Items
-  gsap.utils.toArray('.catalogue-item').forEach((item, i) => {
-    gsap.from(item, {
-      scrollTrigger: {
-        trigger: item,
-        start: 'top 88%',
-        toggleActions: 'play none none none'
-      },
-      opacity: 0,
-      y: 24,
-      duration: 0.65,
-      delay: (i % 3) * 0.1,
-      ease: 'power2.out'
-    });
-  });
+    firmTl.fromTo(firmLines,
+      { y: '115%' },
+      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
+    );
+    if (firmParas.length) {
+      firmTl.fromTo(firmParas,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.06, ease: 'power2.out' },
+        '-=0.25'
+      );
+    }
+    if (firmSlate) {
+      firmTl.fromTo(firmSlate,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.48, ease: 'power2.out' },
+        '<+=0.1'
+      );
+    }
+    if (firmExpand) {
+      firmTl.fromTo(firmExpand,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' },
+        '<+=0.15'
+      );
+    }
+  }
 
-  // 3. Doctrine Columns
-  gsap.utils.toArray('.doctrine-col').forEach((col, i) => {
-    gsap.from(col, {
+  // 4. Practice Areas Section (#practice-areas)
+  const practiceCol = document.querySelector('#practice-areas .practice-intro-col');
+  if (practiceCol) {
+    const pLines = practiceCol.querySelectorAll('.reveal-line');
+    const pDesc = practiceCol.querySelector('.practice-intro-desc');
+    const pFoot = practiceCol.querySelector('.practice-intro-footer');
+
+    const pTl = gsap.timeline({
       scrollTrigger: {
-        trigger: col,
+        trigger: practiceCol,
         start: 'top 85%',
-        toggleActions: 'play none none none'
-      },
-      opacity: 0,
-      y: 30,
-      duration: 0.7,
-      delay: i * 0.12,
-      ease: 'power2.out'
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
     });
+
+    pTl.fromTo(pLines,
+      { y: '115%' },
+      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
+    );
+    if (pDesc) {
+      pTl.fromTo(pDesc,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' },
+        '-=0.22'
+      );
+    }
+    if (pFoot) {
+      pTl.fromTo(pFoot,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' },
+        '-=0.18'
+      );
+    }
+  }
+
+  // Practice Areas: reveal each number first, then its title, then its short description
+  document.querySelectorAll('.catalogue-item').forEach((item) => {
+    const num = item.querySelector('.catalogue-idx');
+    const domain = item.querySelector('.catalogue-domain');
+    const title = item.querySelector('.catalogue-title');
+    const desc = item.querySelector('.catalogue-summary');
+    const toggle = item.querySelector('.btn-catalogue-toggle');
+
+    const itemTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: item,
+        start: 'top 85%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    // 1. Number first (along with domain label)
+    if (num) {
+      itemTl.fromTo([num, domain].filter(Boolean),
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }
+      );
+    }
+    // 2. Title next
+    if (title) {
+      itemTl.fromTo(title,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
+        '-=0.14'
+      );
+    }
+    // 3. Short description
+    if (desc) {
+      itemTl.fromTo(desc,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
+        '-=0.14'
+      );
+    }
+    if (toggle) {
+      itemTl.fromTo(toggle,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.25, ease: 'power2.out' },
+        '-=0.12'
+      );
+    }
   });
 
-  // 4. Advocate Profile Cards
-  gsap.utils.toArray('.advocate-profile-card').forEach((card, i) => {
-    gsap.from(card, {
+  // 5. Litigation Doctrine Section (#approach)
+  const doctrineSection = document.getElementById('approach');
+  if (doctrineSection) {
+    const dHeader = doctrineSection.querySelector('.text-center');
+    const dLines = doctrineSection.querySelectorAll('.reveal-line');
+    const dCols = doctrineSection.querySelectorAll('.doctrine-col');
+
+    if (dHeader) {
+      gsap.fromTo(dLines,
+        { y: '115%' },
+        {
+          y: '0%',
+          duration: 0.5,
+          stagger: 0.08,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: dHeader,
+            start: 'top 85%',
+            end: 'bottom 10%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
+      );
+    }
+
+    const dGrid = doctrineSection.querySelector('.doctrine-columns-grid');
+    if (dGrid) {
+      gsap.fromTo(dCols,
+        { opacity: 0, y: 22 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: dGrid,
+            start: 'top 85%',
+            end: 'bottom 10%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
+      );
+    }
+  }
+
+  // 6. Advocates Section (#advocates)
+  const advocatesHeader = document.querySelector('#advocates .text-center');
+  if (advocatesHeader) {
+    const aLines = advocatesHeader.querySelectorAll('.reveal-line');
+    const aLead = advocatesHeader.querySelector('.firm-paragraph-lead');
+    const aTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: advocatesHeader,
+        start: 'top 85%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    aTl.fromTo(aLines,
+      { y: '115%' },
+      { y: '0%', duration: 0.5, ease: 'power3.out' }
+    );
+    if (aLead) {
+      aTl.fromTo(aLead,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' },
+        '-=0.22'
+      );
+    }
+  }
+
+  // For each advocate card:
+  // "reveal each existing portrait first, followed by the name, role, short biography and specialties."
+  document.querySelectorAll('.advocate-profile-card').forEach((card) => {
+    const crest = card.querySelector('.advocate-crest');
+    const role = card.querySelector('.advocate-role-pill');
+    const name = card.querySelector('.advocate-name');
+    const barStatus = card.querySelector('.advocate-bar-status');
+    const bio = card.querySelector('.advocate-bio-summary');
+    const specs = card.querySelector('.advocate-specialties');
+    const btn = card.querySelector('.btn-advocate-details');
+
+    const cardTl = gsap.timeline({
       scrollTrigger: {
         trigger: card,
         start: 'top 85%',
-        toggleActions: 'play none none none'
-      },
-      opacity: 0,
-      y: 24,
-      duration: 0.65,
-      delay: (i % 2) * 0.12,
-      ease: 'power2.out'
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
     });
+
+    // 1st: Existing portrait (crest)
+    if (crest) {
+      cardTl.fromTo(crest,
+        { opacity: 0, scale: 0.86, y: 10 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: 'power2.out' }
+      );
+    }
+
+    // 2nd: Name & Role
+    const titlesGroup = [role, name, barStatus].filter(Boolean);
+    if (titlesGroup.length) {
+      cardTl.fromTo(titlesGroup,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.28, stagger: 0.04, ease: 'power2.out' },
+        '-=0.14'
+      );
+    }
+
+    // 3rd: Short Biography
+    if (bio) {
+      cardTl.fromTo(bio,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
+        '-=0.14'
+      );
+    }
+
+    // 4th: Specialties
+    if (specs) {
+      cardTl.fromTo(specs,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' },
+        '-=0.14'
+      );
+    }
+
+    if (btn) {
+      cardTl.fromTo(btn,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.25, ease: 'power2.out' },
+        '-=0.12'
+      );
+    }
   });
 }

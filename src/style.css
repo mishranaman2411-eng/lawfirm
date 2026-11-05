@@ -817,6 +817,35 @@ button {
 }
 
 /* ==========================================================================
+   TEXT REVEAL ANIMATIONS (LINE-BY-LINE & PARAGRAPH CLIPPING MASKS)
+   ========================================================================== */
+.reveal-line-wrap {
+  display: block;
+  overflow: hidden;
+  line-height: 1.22;
+  padding-bottom: 0.18em;
+  margin-bottom: -0.08em;
+}
+
+.reveal-line {
+  display: block;
+  transform: translateY(115%);
+  will-change: transform;
+}
+
+.reveal-paragraph {
+  opacity: 0;
+  transform: translateY(18px);
+  will-change: transform, opacity;
+}
+
+.reveal-statement {
+  opacity: 0;
+  transform: translateY(20px);
+  will-change: transform, opacity;
+}
+
+/* ==========================================================================
    SECTION 1: THE FIRM
    ========================================================================== */
 .editorial-firm-grid {
