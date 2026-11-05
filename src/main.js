@@ -5,6 +5,9 @@ gsap.registerPlugin(ScrollTrigger);
 
 document.addEventListener('DOMContentLoaded', () => {
   initNavbarScrollState();
+  initMobileNav();
+  initScrollSpy();
+  initBackToTop();
   initHeroScrub();
   initDrawers();
   initConsultationAppointmentForm();
@@ -566,6 +569,109 @@ function initDrawers() {
 }
 
 /**
+ * Mobile Navigation Drawer Controller
+ */
+function initMobileNav() {
+  const toggleBtn = document.getElementById('mobile-nav-toggle');
+  const drawer = document.getElementById('mobile-nav-drawer');
+  const closeBtn = document.getElementById('mobile-nav-close');
+  const backdrop = document.getElementById('mobile-nav-backdrop');
+  if (!toggleBtn || !drawer) return;
+
+  function openMenu() {
+    drawer.classList.add('open');
+    toggleBtn.classList.add('open');
+    toggleBtn.setAttribute('aria-expanded', 'true');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMenu() {
+    drawer.classList.remove('open');
+    toggleBtn.classList.remove('open');
+    toggleBtn.setAttribute('aria-expanded', 'false');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    const isOpen = drawer.classList.contains('open');
+    if (isOpen) closeMenu();
+    else openMenu();
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+  if (backdrop) backdrop.addEventListener('click', closeMenu);
+
+  drawer.querySelectorAll('.mobile-nav-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      closeMenu();
+    });
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) {
+      closeMenu();
+    }
+  });
+}
+
+/**
+ * ScrollSpy: Highlights active navigation link based on current viewport section
+ */
+function initScrollSpy() {
+  const sectionIds = ['advocates', 'practice-areas', 'firm-statistics', 'approach', 'consultation'];
+  const sections = sectionIds.map((id) => document.getElementById(id)).filter(Boolean);
+  if (!sections.length) return;
+
+  function updateActiveNav() {
+    const scrollPos = window.scrollY + window.innerHeight * 0.35;
+    let currentId = '';
+
+    sections.forEach((sec) => {
+      const top = sec.offsetTop;
+      const height = sec.offsetHeight;
+      if (scrollPos >= top && scrollPos < top + height) {
+        currentId = sec.getAttribute('id');
+      }
+    });
+
+    document.querySelectorAll('.site-nav__link, .mobile-nav-link').forEach((link) => {
+      const href = link.getAttribute('href');
+      if (currentId && href === `#${currentId}`) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActiveNav, { passive: true });
+  updateActiveNav();
+}
+
+/**
+ * Floating Back-to-Top Button Controller
+ */
+function initBackToTop() {
+  const backBtn = document.getElementById('back-to-top');
+  if (!backBtn) return;
+
+  function handleScroll() {
+    if (window.scrollY > window.innerHeight * 1.8) {
+      backBtn.classList.add('visible');
+    } else {
+      backBtn.classList.remove('visible');
+    }
+  }
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  backBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+/**
  * Confidential Consultation Appointment Form Handler
  */
 function initConsultationAppointmentForm() {
@@ -573,25 +679,47 @@ function initConsultationAppointmentForm() {
   const statusMsg = document.getElementById('intake-status-msg');
   if (!form) return;
 
+  const phoneInput = document.getElementById('client-phone');
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+
+    // Client-side phone verification
+    if (phoneInput) {
+      const cleanPhone = phoneInput.value.replace(/[^0-9+]/g, '');
+      if (cleanPhone.length < 10) {
+        phoneInput.focus();
+        if (statusMsg) {
+          statusMsg.className = 'form-feedback-pill error';
+          statusMsg.innerHTML = '<strong>Invalid Telephone:</strong> Please enter a valid telephone or mobile number with country code.';
+        }
+        return;
+      }
+    }
+
     const btn = form.querySelector('.btn-submit-appointment');
     if (!btn) return;
 
+    const domainSelect = document.getElementById('client-forum');
+    const venueSelect = document.getElementById('client-venue');
+    const domainText = domainSelect && domainSelect.selectedIndex > 0 ? domainSelect.options[domainSelect.selectedIndex].text : 'Commercial Litigation & Injunctions';
+    const venueText = venueSelect && venueSelect.selectedIndex >= 0 ? venueSelect.options[venueSelect.selectedIndex].text : 'Gurugram Corporate Chambers';
+
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span>Checking Conflict &amp; Transmitting...</span>';
+    btn.innerHTML = '<span>Conducting Conflict Clearance &amp; Transmitting...</span>';
     btn.disabled = true;
 
     // Simulated verified intake transmission
     setTimeout(() => {
-      const refCode = 'MA-' + Math.floor(1000 + Math.random() * 9000);
-      btn.innerHTML = '<span>Appointment Request Registered</span>';
+      const refCode = 'MA-2026-' + Math.floor(1000 + Math.random() * 9000);
+      btn.innerHTML = '<span>Chambers Request Registered</span>';
       
       if (statusMsg) {
         statusMsg.className = 'form-feedback-pill success';
         statusMsg.innerHTML = `
-          <strong>Chambers Registry Notice:</strong> Request reference <strong>#${refCode}</strong> generated.<br />
-          Counsel will conduct preliminary conflict clearance and contact your office within 4 business hours.
+          <strong>Chambers Registry Notice:</strong> Matter File Reference <strong>#${refCode}</strong> generated.<br />
+          <strong>Domain:</strong> ${domainText} · <strong>Venue:</strong> ${venueText}<br />
+          Counsel is conducting preliminary conflict clearance. Our office will initiate direct contact within 4 business hours.
         `;
       }
       form.reset();
@@ -599,8 +727,8 @@ function initConsultationAppointmentForm() {
       setTimeout(() => {
         btn.innerHTML = originalText;
         btn.disabled = false;
-      }, 6000);
-    }, 900);
+      }, 7000);
+    }, 850);
   });
 }
 

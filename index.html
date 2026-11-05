@@ -7,6 +7,50 @@
   <meta name="description" content="Malik &amp; Associates: Premier legal consultancy and courtroom advocacy practicing across Delhi NCR, Gurugram, Delhi High Court, and appellate tribunals." />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="stylesheet" href="/src/style.css" />
+
+  <!-- Open Graph & Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Malik &amp; Associates · Advocates &amp; Legal Consultants" />
+  <meta property="og:description" content="Premier appellate courtroom advocacy and commercial legal consultancy practicing before the Supreme Court of India, High Court of Delhi, and appellate tribunals." />
+  <meta property="og:site_name" content="Malik &amp; Associates" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Malik &amp; Associates · Advocates &amp; Legal Consultants" />
+  <meta name="twitter:description" content="Strategic legal counsel across corporate, commercial, and complex appellate litigation in Delhi NCR &amp; Gurugram." />
+  <meta name="theme-color" content="#181513" />
+
+  <!-- Schema.org LegalService Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LegalService",
+    "name": "Malik & Associates · Advocates & Legal Consultants",
+    "url": "https://malikassociates.co.in",
+    "logo": "/favicon.svg",
+    "description": "Premier courtroom advocacy and strategic legal counsel practicing before the Supreme Court of India, Delhi High Court, NCLT, and HARERA.",
+    "telephone": "+91-9560046503",
+    "email": "info@malikassociates.co.in",
+    "founder": {
+      "@type": "Person",
+      "name": "Adv. Sapna Malik",
+      "jobTitle": "Managing Partner & Lead Counsel"
+    },
+    "address": [
+      {
+        "@type": "PostalAddress",
+        "addressLocality": "New Delhi",
+        "addressRegion": "Delhi NCR",
+        "addressCountry": "IN"
+      },
+      {
+        "@type": "PostalAddress",
+        "addressLocality": "Gurugram",
+        "addressRegion": "Haryana",
+        "addressCountry": "IN"
+      }
+    ],
+    "openingHours": "Mo-Sa 10:00-19:30"
+  }
+  </script>
 </head>
 <body>
 
@@ -30,8 +74,35 @@
     <div class="site-nav__actions">
       <a href="tel:+919560046503" class="site-nav__phone">+91-9560046503</a>
       <a href="#consultation" class="site-nav__cta">Consultation &rarr;</a>
+      <button class="site-nav__menu-btn" id="mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-nav-drawer">
+        <span class="menu-bar"></span>
+        <span class="menu-bar"></span>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav-drawer" id="mobile-nav-drawer" aria-hidden="true">
+    <div class="mobile-nav-backdrop" id="mobile-nav-backdrop"></div>
+    <div class="mobile-nav-panel">
+      <div class="mobile-nav-header">
+        <span class="mobile-nav-title">CHAMBERS DIRECTORY</span>
+        <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu">&times;</button>
+      </div>
+      <ul class="mobile-nav-links">
+        <li><a href="#advocates" class="mobile-nav-link"><span class="nav-idx">01</span> Advocates</a></li>
+        <li><a href="#practice-areas" class="mobile-nav-link"><span class="nav-idx">02</span> Practice Areas</a></li>
+        <li><a href="#firm-statistics" class="mobile-nav-link"><span class="nav-idx">03</span> Track Record</a></li>
+        <li><a href="#approach" class="mobile-nav-link"><span class="nav-idx">04</span> Litigation Doctrine</a></li>
+        <li><a href="#consultation" class="mobile-nav-link"><span class="nav-idx">05</span> Chambers Consultation</a></li>
+      </ul>
+      <div class="mobile-nav-contact">
+        <span class="mobile-contact-label">DIRECT INQUIRIES</span>
+        <a href="tel:+919560046503" class="mobile-contact-line">+91-9560046503</a>
+        <a href="mailto:info@malikassociates.co.in" class="mobile-contact-line">info@malikassociates.co.in</a>
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================================================
        HERO EXPERIENCE: CINEMATIC COURTHOUSE ASCENT & KNOCKOUT TYPOGRAPHY
@@ -903,6 +974,14 @@
 
     </div>
   </footer>
+
+  <!-- Floating Back to Top Button -->
+  <button class="back-to-top" id="back-to-top" aria-label="Return to top of page" title="Return to top">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+    <span class="sr-only">Top</span>
+  </button>
 
   <script type="module" src="/src/main.js"></script>
 </body>
