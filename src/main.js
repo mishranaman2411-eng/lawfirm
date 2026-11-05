@@ -693,17 +693,58 @@ function initEditorialScrollReveals() {
   }
 
   // 4. Practice Areas Section (#practice-areas)
-  // Animate ONLY the first practice area item ("Commercial Litigation") title and description together
+  // Heading reveal
+  const practiceHeading = document.querySelector('#practice-areas .editorial-main-heading');
+  if (practiceHeading) {
+    const practiceLines = practiceHeading.querySelectorAll('.reveal-line');
+    gsap.fromTo(
+      practiceLines,
+      { y: '115%', opacity: 0 },
+      {
+        y: '0%',
+        opacity: 1,
+        duration: 0.85,
+        stagger: 0.12,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '#practice-areas',
+          start: 'top 80%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  }
+
+  // Introductory paragraph fade and rise
+  const practiceDesc = document.querySelector('#practice-areas .practice-intro-desc');
+  if (practiceDesc) {
+    gsap.fromTo(
+      practiceDesc,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: '#practice-areas',
+          start: 'top 80%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  }
+
+  // Existing Item 1 ("Commercial Litigation") title and description together
   const firstItem = document.querySelector('#practice-item-1');
   if (firstItem) {
     const itemContent = firstItem.querySelector('.catalogue-text-content');
     if (itemContent) {
       gsap.fromTo(
         itemContent,
-        {
-          y: '105%',
-          opacity: 0
-        },
+        { y: '105%', opacity: 0 },
         {
           y: '0%',
           opacity: 1,
@@ -720,141 +761,175 @@ function initEditorialScrollReveals() {
     }
   }
 
+  // Remaining four practice area items: Arbitration, Property & HARERA, Insolvency & NCLT, Constitutional Litigation
+  const remainingPracticeItems = [
+    '#practice-item-2',
+    '#practice-item-3',
+    '#practice-item-4',
+    '#practice-item-5'
+  ];
+
+  remainingPracticeItems.forEach((sel, idx) => {
+    const item = document.querySelector(sel);
+    if (!item) return;
+    const content = item.querySelector('.catalogue-text-content');
+    if (!content) return;
+
+    gsap.fromTo(
+      content,
+      { y: '105%', opacity: 0 },
+      {
+        y: '0%',
+        opacity: 1,
+        duration: 0.8,
+        delay: idx * 0.08,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: item,
+          start: 'top 85%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
+      }
+    );
+  });
+
   // 5. Litigation Doctrine Section (#approach)
   const doctrineSection = document.getElementById('approach');
   if (doctrineSection) {
-    const dHeader = doctrineSection.querySelector('.text-center');
-    const dLines = doctrineSection.querySelectorAll('.reveal-line');
+    const dEyebrow = doctrineSection.querySelector('.eyebrow-tag');
+    const dLines = doctrineSection.querySelectorAll('.editorial-main-heading .reveal-line');
     const dCols = doctrineSection.querySelectorAll('.doctrine-col');
 
-    if (dHeader) {
-      gsap.fromTo(dLines,
-        { y: '115%' },
-        {
-          y: '0%',
-          duration: 0.5,
-          stagger: 0.08,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: dHeader,
-            start: 'top 85%',
-            end: 'bottom 10%',
-            toggleActions: 'play reverse play reverse'
-          }
-        }
+    const doctrineTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: doctrineSection,
+        start: 'top 80%',
+        end: 'bottom 10%',
+        toggleActions: 'play reverse play reverse'
+      }
+    });
+
+    if (dLines.length) {
+      doctrineTl.fromTo(
+        dLines,
+        { y: '115%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.85, stagger: 0.12, ease: 'power3.out' }
       );
     }
-
-    const dGrid = doctrineSection.querySelector('.doctrine-columns-grid');
-    if (dGrid) {
-      gsap.fromTo(dCols,
-        { opacity: 0, y: 22 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          stagger: 0.08,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: dGrid,
-            start: 'top 85%',
-            end: 'bottom 10%',
-            toggleActions: 'play reverse play reverse'
-          }
-        }
+    if (dEyebrow) {
+      doctrineTl.fromTo(
+        dEyebrow,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+        '-=0.5'
       );
+    }
+    if (dCols.length) {
+      dCols.forEach((col, idx) => {
+        const num = col.querySelector('.doctrine-num');
+        const text = col.querySelector('.doctrine-text-content') || col;
+        doctrineTl.fromTo(
+          [num, text].filter(Boolean),
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+          idx === 0 ? '-=0.2' : '-=0.42'
+        );
+      });
     }
   }
 
   // 6. Advocates Section (#advocates)
-  const advocatesHeader = document.querySelector('#advocates .text-center');
-  if (advocatesHeader) {
-    const aLines = advocatesHeader.querySelectorAll('.reveal-line');
-    const aLead = advocatesHeader.querySelector('.firm-paragraph-lead');
-    const aTl = gsap.timeline({
+  const advocatesSection = document.getElementById('advocates');
+  if (advocatesSection) {
+    const advLines = advocatesSection.querySelectorAll('.editorial-main-heading .reveal-line');
+    const advIntro = advocatesSection.querySelector('.firm-paragraph-lead');
+    const advCards = advocatesSection.querySelectorAll('.advocate-profile-card');
+
+    const advTl = gsap.timeline({
       scrollTrigger: {
-        trigger: advocatesHeader,
-        start: 'top 85%',
+        trigger: advocatesSection,
+        start: 'top 80%',
         end: 'bottom 10%',
         toggleActions: 'play reverse play reverse'
       }
     });
 
-    aTl.fromTo(aLines,
-      { y: '115%' },
-      { y: '0%', duration: 0.5, ease: 'power3.out' }
-    );
-    if (aLead) {
-      aTl.fromTo(aLead,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' },
-        '-=0.22'
+    if (advLines.length) {
+      advTl.fromTo(
+        advLines,
+        { y: '115%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.85, ease: 'power3.out' }
       );
+    }
+    if (advIntro) {
+      advTl.fromTo(
+        advIntro,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+        '-=0.4'
+      );
+    }
+    if (advCards.length) {
+      advCards.forEach((card, idx) => {
+        const content = card.querySelector('.advocate-card-content') || card;
+        advTl.fromTo(
+          content,
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out' },
+          idx === 0 ? '-=0.15' : '-=0.45'
+        );
+      });
     }
   }
 
-  // For each advocate card:
-  // "reveal each existing portrait first, followed by the name, role, short biography and specialties."
-  document.querySelectorAll('.advocate-profile-card').forEach((card) => {
-    const crest = card.querySelector('.advocate-crest');
-    const role = card.querySelector('.advocate-role-pill');
-    const name = card.querySelector('.advocate-name');
-    const barStatus = card.querySelector('.advocate-bar-status');
-    const bio = card.querySelector('.advocate-bio-summary');
-    const specs = card.querySelector('.advocate-specialties');
-    const btn = card.querySelector('.btn-advocate-details');
+  // 7. Contact Section (#consultation)
+  const contactSection = document.getElementById('consultation');
+  if (contactSection) {
+    const cLines = contactSection.querySelectorAll('.editorial-main-heading .reveal-line');
+    const cSupport = contactSection.querySelector('.consultation-supporting');
+    const cLocationBoxes = contactSection.querySelectorAll('.location-box');
+    const cForm = contactSection.querySelector('.appointment-form-card');
 
-    const cardTl = gsap.timeline({
+    const contactTl = gsap.timeline({
       scrollTrigger: {
-        trigger: card,
-        start: 'top 85%',
+        trigger: contactSection,
+        start: 'top 80%',
         end: 'bottom 10%',
         toggleActions: 'play reverse play reverse'
       }
     });
 
-    // 1st: Existing portrait (crest)
-    if (crest) {
-      cardTl.fromTo(crest,
-        { opacity: 0, scale: 0.86, y: 10 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.28, ease: 'power2.out' }
+    if (cLines.length) {
+      contactTl.fromTo(
+        cLines,
+        { y: '115%', opacity: 0 },
+        { y: '0%', opacity: 1, duration: 0.85, ease: 'power3.out' }
       );
     }
-
-    // 2nd: Name & Role
-    const titlesGroup = [role, name, barStatus].filter(Boolean);
-    if (titlesGroup.length) {
-      cardTl.fromTo(titlesGroup,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.28, stagger: 0.04, ease: 'power2.out' },
-        '-=0.14'
+    if (cSupport) {
+      contactTl.fromTo(
+        cSupport,
+        { opacity: 0, y: 16 },
+        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
+        '-=0.4'
       );
     }
-
-    // 3rd: Short Biography
-    if (bio) {
-      cardTl.fromTo(bio,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
-        '-=0.14'
+    if (cLocationBoxes.length) {
+      contactTl.fromTo(
+        cLocationBoxes,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.55, stagger: 0.12, ease: 'power2.out' },
+        '-=0.2'
       );
     }
-
-    // 4th: Specialties
-    if (specs) {
-      cardTl.fromTo(specs,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' },
-        '-=0.14'
+    if (cForm) {
+      contactTl.fromTo(
+        cForm,
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+        '-=0.25'
       );
     }
-
-    if (btn) {
-      cardTl.fromTo(btn,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.25, ease: 'power2.out' },
-        '-=0.12'
-      );
-    }
-  });
+  }
 }
