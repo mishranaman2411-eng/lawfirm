@@ -581,11 +581,10 @@ function initEditorialScrollReveals() {
     }
     if (advCards.length) {
       advCards.forEach((card, idx) => {
-        const content = card.querySelector('.advocate-card-content') || card;
         advTl.fromTo(
-          content,
-          { opacity: 0, y: 22 },
-          { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out' },
+          card,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
           idx === 0 ? '-=0.15' : '-=0.45'
         );
       });
