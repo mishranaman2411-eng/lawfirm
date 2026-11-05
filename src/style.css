@@ -283,6 +283,7 @@ button {
   left: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -2365,6 +2366,31 @@ button {
   }
   .hero-hud__top {
     display: none;
+  }
+  .hero-opening-content {
+    padding: 5.5rem 1.25rem 2.2rem;
+  }
+  .hero-opening-kicker {
+    font-size: 0.64rem;
+    letter-spacing: 0.16em;
+    margin-bottom: 0.85rem;
+  }
+  .hero-opening-headline {
+    font-size: clamp(2rem, 7.2vw, 2.75rem);
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    margin-bottom: 0.95rem;
+    max-width: 16ch;
+  }
+  .hero-opening-subhead {
+    font-size: 0.88rem;
+    line-height: 1.5;
+    margin-bottom: 1.6rem;
+    max-width: 34ch;
+  }
+  .hero-pill-btn {
+    padding: 0.75rem 1.65rem;
+    font-size: 0.84rem;
   }
   .hero-knockout-stage {
     padding: 7.2rem 1.5rem 2.6rem;

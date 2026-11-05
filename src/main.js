@@ -119,8 +119,8 @@ function initHeroScrub() {
       }
     } else {
       // MOBILE & TABLET PORTRAIT:
-      // Fit building width comfortably on screen without ever cropping (~88% of screen width)
-      const targetBuildingW = Math.min(w * 0.88, SAFE_WIDTH);
+      // Fit building width comfortably on screen without ever cropping (~94% of screen width)
+      const targetBuildingW = Math.min(w * 0.94, SAFE_WIDTH);
       const scale = targetBuildingW / SAFE_WIDTH;
       drawW = srcW * scale;
       drawH = srcH * scale;
@@ -225,6 +225,12 @@ function initHeroScrub() {
 
   window.addEventListener('resize', resizeCanvas);
 
+  // Pre-allocated offscreen buffers for mobile full-screen atmospheric rendering
+  let ambientCanvas = null;
+  let ambientCtx = null;
+  let featherCanvas = null;
+  let featherCtx = null;
+
   // High-performance Draw function that preserves 16:9 aspect ratio without cropping
   function drawFrame(frameIndex) {
     const targetImg = findNearestLoadedFrame(frameIndex);
@@ -234,19 +240,112 @@ function initHeroScrub() {
 
     const w = canvasWidth;
     const h = canvasHeight;
+    const aspect = w / h;
+    const isMobile = w < 900 || aspect < 1.25;
     const { drawW, drawH, drawX, drawY } = getFrameDrawMetrics();
 
-    // Atmospheric background gradient matching exact frame edge colors
-    const grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, '#C5D6D9');
-    grad.addColorStop(0.35, '#CCD7DA');
-    grad.addColorStop(0.65, '#C8CDC6');
-    grad.addColorStop(1, '#C4C8C0');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, w, h);
+    if (!isMobile) {
+      // DESKTOP: Direct crisp rendering with matched frame edge gradients
+      const grad = ctx.createLinearGradient(0, 0, 0, h);
+      grad.addColorStop(0, '#C5D6D9');
+      grad.addColorStop(0.35, '#CCD7DA');
+      grad.addColorStop(0.65, '#C8CDC6');
+      grad.addColorStop(1, '#C4C8C0');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
 
-    // Draw the frame
-    ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
+      // Draw the frame
+      ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
+
+      // Feather top and bottom edges if letterboxed
+      if (drawY > 0) {
+        const skyGrad = ctx.createLinearGradient(0, 0, 0, drawY + 65);
+        skyGrad.addColorStop(0, '#C5D6D9');
+        skyGrad.addColorStop(0.45, '#C5D6D9');
+        skyGrad.addColorStop(1, 'rgba(197, 214, 217, 0)');
+        ctx.fillStyle = skyGrad;
+        ctx.fillRect(0, 0, w, drawY + 65);
+
+        const cloudGrad = ctx.createLinearGradient(0, drawY + drawH - 65, 0, h);
+        cloudGrad.addColorStop(0, 'rgba(196, 200, 192, 0)');
+        cloudGrad.addColorStop(0.45, '#C4C8C0');
+        cloudGrad.addColorStop(1, '#C4C8C0');
+        ctx.fillStyle = cloudGrad;
+        ctx.fillRect(0, drawY + drawH - 65, w, h - (drawY + drawH - 65));
+      }
+    } else {
+      // MOBILE: Seamless edge-to-edge full-screen video atmosphere with 100% uncropped courthouse
+      const srcW = 1600;
+      const srcH = 900;
+
+      // 1. Live video atmospheric cover layer across 100% of the mobile viewport
+      // Downscaled offscreen buffer enables GPU-accelerated silky smooth bilinear upscaling at 60fps
+      const ambW = 160;
+      const ambH = Math.max(280, Math.round(160 * (h / w)));
+      if (!ambientCanvas) {
+        ambientCanvas = document.createElement('canvas');
+        ambientCtx = ambientCanvas.getContext('2d');
+      }
+      if (ambientCanvas.width !== ambW || ambientCanvas.height !== ambH) {
+        ambientCanvas.width = ambW;
+        ambientCanvas.height = ambH;
+      }
+
+      const coverScale = Math.max(ambW / srcW, ambH / srcH);
+      const cW = srcW * coverScale;
+      const cH = srcH * coverScale;
+      const cX = (ambW - cW) / 2;
+      const cY = (ambH - cH) / 2;
+      ambientCtx.drawImage(targetImg, cX, cY, cW, cH);
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(ambientCanvas, 0, 0, w, h);
+
+      // Subtle atmospheric gradient overlay for text readability & editorial warmth
+      const ambGrad = ctx.createLinearGradient(0, 0, 0, h);
+      ambGrad.addColorStop(0, 'rgba(197, 214, 217, 0.40)');
+      ambGrad.addColorStop(0.26, 'rgba(24, 21, 19, 0.04)');
+      ambGrad.addColorStop(0.74, 'rgba(24, 21, 19, 0.04)');
+      ambGrad.addColorStop(1, 'rgba(196, 200, 192, 0.48)');
+      ctx.fillStyle = ambGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Focused uncropped architectural courthouse layer
+      const fW = Math.ceil(drawW);
+      const fH = Math.ceil(drawH);
+      if (!featherCanvas) {
+        featherCanvas = document.createElement('canvas');
+        featherCtx = featherCanvas.getContext('2d');
+      }
+      if (featherCanvas.width !== fW || featherCanvas.height !== fH) {
+        featherCanvas.width = fW;
+        featherCanvas.height = fH;
+      }
+
+      featherCtx.globalCompositeOperation = 'source-over';
+      featherCtx.drawImage(targetImg, 0, 0, fW, fH);
+
+      // Feather top sky and bottom mist into the live video atmosphere
+      featherCtx.globalCompositeOperation = 'destination-out';
+      const topFeather = fH * 0.20;
+      const tGrad = featherCtx.createLinearGradient(0, 0, 0, topFeather);
+      tGrad.addColorStop(0, 'rgba(0,0,0,1)');
+      tGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
+      tGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      featherCtx.fillStyle = tGrad;
+      featherCtx.fillRect(0, 0, fW, topFeather);
+
+      const botFeather = fH * 0.22;
+      const bGrad = featherCtx.createLinearGradient(0, fH - botFeather, 0, fH);
+      bGrad.addColorStop(0, 'rgba(0,0,0,0)');
+      bGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
+      bGrad.addColorStop(1, 'rgba(0,0,0,1)');
+      featherCtx.fillStyle = bGrad;
+      featherCtx.fillRect(0, fH - botFeather, fW, botFeather);
+
+      ctx.drawImage(featherCanvas, drawX, drawY);
+    }
 
     // Sync live frame rendering inside the knockout typography
     if (koLiveImg) {
@@ -255,25 +354,6 @@ function initHeroScrub() {
       koLiveImg.setAttribute('y', `${drawY}`);
       koLiveImg.setAttribute('width', `${drawW}`);
       koLiveImg.setAttribute('height', `${drawH}`);
-    }
-
-    // Feather top and bottom edges if letterboxed on mobile or portrait
-    if (drawY > 0) {
-      // Soft sky transition above drawY
-      const skyGrad = ctx.createLinearGradient(0, 0, 0, drawY + 65);
-      skyGrad.addColorStop(0, '#C5D6D9');
-      skyGrad.addColorStop(0.45, '#C5D6D9');
-      skyGrad.addColorStop(1, 'rgba(197, 214, 217, 0)');
-      ctx.fillStyle = skyGrad;
-      ctx.fillRect(0, 0, w, drawY + 65);
-
-      // Soft cloud transition below drawY + drawH
-      const cloudGrad = ctx.createLinearGradient(0, drawY + drawH - 65, 0, h);
-      cloudGrad.addColorStop(0, 'rgba(196, 200, 192, 0)');
-      cloudGrad.addColorStop(0.45, '#C4C8C0');
-      cloudGrad.addColorStop(1, '#C4C8C0');
-      ctx.fillStyle = cloudGrad;
-      ctx.fillRect(0, drawY + drawH - 65, w, h - (drawY + drawH - 65));
     }
   }
 
