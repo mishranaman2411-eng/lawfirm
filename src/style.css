@@ -830,7 +830,7 @@ button {
 .reveal-line {
   display: block;
   transform: translateY(115%);
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 .reveal-paragraph {

@@ -693,89 +693,31 @@ function initEditorialScrollReveals() {
   }
 
   // 4. Practice Areas Section (#practice-areas)
-  const practiceCol = document.querySelector('#practice-areas .practice-intro-col');
-  if (practiceCol) {
-    const pLines = practiceCol.querySelectorAll('.reveal-line');
-    const pDesc = practiceCol.querySelector('.practice-intro-desc');
-    const pFoot = practiceCol.querySelector('.practice-intro-footer');
-
-    const pTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: practiceCol,
-        start: 'top 85%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
+  // Animate ONLY the heading "Focused Counsel. Five Core Disciplines." with line-by-line masked reveal
+  const practiceHeading = document.querySelector('#practice-areas .editorial-main-heading');
+  if (practiceHeading) {
+    const practiceLines = practiceHeading.querySelectorAll('.reveal-line');
+    gsap.fromTo(
+      practiceLines,
+      {
+        y: '115%',
+        opacity: 0
+      },
+      {
+        y: '0%',
+        opacity: 1,
+        duration: 0.85,
+        stagger: 0.12,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '#practice-areas',
+          start: 'top 80%',
+          end: 'bottom 10%',
+          toggleActions: 'play reverse play reverse'
+        }
       }
-    });
-
-    pTl.fromTo(pLines,
-      { y: '115%' },
-      { y: '0%', duration: 0.5, stagger: 0.08, ease: 'power3.out' }
     );
-    if (pDesc) {
-      pTl.fromTo(pDesc,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.42, ease: 'power2.out' },
-        '-=0.22'
-      );
-    }
-    if (pFoot) {
-      pTl.fromTo(pFoot,
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.38, ease: 'power2.out' },
-        '-=0.18'
-      );
-    }
   }
-
-  // Practice Areas: reveal each number first, then its title, then its short description
-  document.querySelectorAll('.catalogue-item').forEach((item) => {
-    const num = item.querySelector('.catalogue-idx');
-    const domain = item.querySelector('.catalogue-domain');
-    const title = item.querySelector('.catalogue-title');
-    const desc = item.querySelector('.catalogue-summary');
-    const toggle = item.querySelector('.btn-catalogue-toggle');
-
-    const itemTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: item,
-        start: 'top 85%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
-      }
-    });
-
-    // 1. Number first (along with domain label)
-    if (num) {
-      itemTl.fromTo([num, domain].filter(Boolean),
-        { opacity: 0, y: 12 },
-        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }
-      );
-    }
-    // 2. Title next
-    if (title) {
-      itemTl.fromTo(title,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
-        '-=0.14'
-      );
-    }
-    // 3. Short description
-    if (desc) {
-      itemTl.fromTo(desc,
-        { opacity: 0, y: 14 },
-        { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' },
-        '-=0.14'
-      );
-    }
-    if (toggle) {
-      itemTl.fromTo(toggle,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.25, ease: 'power2.out' },
-        '-=0.12'
-      );
-    }
-  });
 
   // 5. Litigation Doctrine Section (#approach)
   const doctrineSection = document.getElementById('approach');
