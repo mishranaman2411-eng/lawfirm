@@ -1087,6 +1087,16 @@ button {
   color: var(--taupe);
 }
 
+.catalogue-text-mask {
+  overflow: hidden;
+  display: block;
+}
+
+.catalogue-text-content {
+  display: block;
+  will-change: transform, opacity;
+}
+
 .catalogue-title {
   font-family: var(--font-display);
   font-size: 1.35rem;

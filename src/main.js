@@ -693,28 +693,31 @@ function initEditorialScrollReveals() {
   }
 
   // 4. Practice Areas Section (#practice-areas)
-  // Animate ONLY the introductory paragraph with a subtle fade-in and slight upward movement
-  const practiceDesc = document.querySelector('#practice-areas .practice-intro-desc');
-  if (practiceDesc) {
-    gsap.fromTo(
-      practiceDesc,
-      {
-        opacity: 0,
-        y: 20
-      },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: '#practice-areas',
-          start: 'top 80%',
-          end: 'bottom 10%',
-          toggleActions: 'play reverse play reverse'
+  // Animate ONLY the first practice area item ("Commercial Litigation") title and description together
+  const firstItem = document.querySelector('#practice-item-1');
+  if (firstItem) {
+    const itemContent = firstItem.querySelector('.catalogue-text-content');
+    if (itemContent) {
+      gsap.fromTo(
+        itemContent,
+        {
+          y: '105%',
+          opacity: 0
+        },
+        {
+          y: '0%',
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: firstItem,
+            start: 'top 85%',
+            end: 'bottom 10%',
+            toggleActions: 'play reverse play reverse'
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   // 5. Litigation Doctrine Section (#approach)
