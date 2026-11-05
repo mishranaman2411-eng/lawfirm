@@ -56,13 +56,18 @@ function initHeroScrub() {
   let loadedCount = 0;
   let currentRenderedIndex = -1;
 
-  // DOM Elements for HUD / Knockout Stage
+  // DOM Elements for HUD / Hero Opening / Knockout Stage
   const loaderEl = document.getElementById('hero-loader-status');
+  const heroOpeningEl = document.getElementById('hero-opening-content');
   const koStageEl = document.getElementById('hero-knockout-stage');
   const koSvg = document.getElementById('hero-knockout-svg');
-  const dContourText = document.getElementById('ko-contour-desktop');
-  const mContourText1 = document.getElementById('ko-contour-mob-1');
-  const mContourText2 = document.getElementById('ko-contour-mob-2');
+  const koLiveImg = document.getElementById('ko-live-image');
+  const clipDesk = document.getElementById('ko-clip-desktop');
+  const contourDesk = document.getElementById('ko-contour-desktop');
+  const subDesk = document.getElementById('ko-sub-desktop');
+  const clipMob = document.getElementById('ko-clip-mob');
+  const contourMob = document.getElementById('ko-contour-mob');
+  const subMob = document.getElementById('ko-sub-mob');
   const scrollIndicatorEl = document.querySelector('.hero-scroll-indicator');
 
   // Generate Frame URL helper
@@ -141,40 +146,61 @@ function initHeroScrub() {
     const isMobile = w < 860;
 
     if (!isMobile) {
-      if (dContourText) dContourText.style.display = 'block';
-      if (mContourText1) mContourText1.style.display = 'none';
-      if (mContourText2) mContourText2.style.display = 'none';
+      if (clipDesk) clipDesk.style.display = 'block';
+      if (contourDesk) contourDesk.style.display = 'block';
+      if (subDesk) subDesk.style.display = 'block';
 
-      // Desktop font size scaled to span across the scene with architectural grace
-      const fontSize = Math.min(Math.max(w * 0.053, 46), 92);
-      // Centered precisely over the architectural center of the courthouse
-      const textY = buildingCenterY;
+      if (clipMob) clipMob.style.display = 'none';
+      if (contourMob) contourMob.style.display = 'none';
+      if (subMob) subMob.style.display = 'none';
 
-      if (dContourText) {
-        dContourText.setAttribute('font-size', `${fontSize}px`);
-        // Precisely positioned at the horizontal architectural center of the courthouse
-        dContourText.setAttribute('x', `${buildingCenterX}`);
-        dContourText.setAttribute('y', `${textY}`);
+      // Giant architectural typography matching reference
+      const mainFontSize = Math.min(Math.max(w * 0.105, 68), 150);
+      const subFontSize = Math.min(Math.max(w * 0.022, 16), 32);
+
+      const mainY = buildingCenterY - mainFontSize * 0.12;
+      const subY = buildingCenterY + mainFontSize * 0.58;
+
+      [clipDesk, contourDesk].forEach(el => {
+        if (el) {
+          el.setAttribute('font-size', `${mainFontSize}px`);
+          el.setAttribute('x', `${buildingCenterX}`);
+          el.setAttribute('y', `${mainY}`);
+        }
+      });
+
+      if (subDesk) {
+        subDesk.setAttribute('font-size', `${subFontSize}px`);
+        subDesk.setAttribute('x', `${buildingCenterX}`);
+        subDesk.setAttribute('y', `${subY}`);
       }
     } else {
-      if (dContourText) dContourText.style.display = 'none';
-      if (mContourText1) mContourText1.style.display = 'block';
-      if (mContourText2) mContourText2.style.display = 'block';
+      if (clipDesk) clipDesk.style.display = 'none';
+      if (contourDesk) contourDesk.style.display = 'none';
+      if (subDesk) subDesk.style.display = 'none';
 
-      // Mobile font size scaled for 2 balanced lines without awkward wrapping or clipping
-      const fontSize = Math.min(Math.max(w * 0.082, 28), 44);
-      const y1 = buildingCenterY - fontSize * 0.68;
-      const y2 = buildingCenterY + fontSize * 0.68;
+      if (clipMob) clipMob.style.display = 'block';
+      if (contourMob) contourMob.style.display = 'block';
+      if (subMob) subMob.style.display = 'block';
 
-      if (mContourText1) {
-        mContourText1.setAttribute('font-size', `${fontSize}px`);
-        mContourText1.setAttribute('x', `${buildingCenterX}`);
-        mContourText1.setAttribute('y', `${y1}`);
-      }
-      if (mContourText2) {
-        mContourText2.setAttribute('font-size', `${fontSize}px`);
-        mContourText2.setAttribute('x', `${buildingCenterX}`);
-        mContourText2.setAttribute('y', `${y2}`);
+      const mainFontSize = Math.min(Math.max(w * 0.16, 44), 82);
+      const subFontSize = Math.min(Math.max(w * 0.045, 13), 22);
+
+      const mainY = buildingCenterY - mainFontSize * 0.18;
+      const subY = buildingCenterY + mainFontSize * 0.52;
+
+      [clipMob, contourMob].forEach(el => {
+        if (el) {
+          el.setAttribute('font-size', `${mainFontSize}px`);
+          el.setAttribute('x', `${buildingCenterX}`);
+          el.setAttribute('y', `${mainY}`);
+        }
+      });
+
+      if (subMob) {
+        subMob.setAttribute('font-size', `${subFontSize}px`);
+        subMob.setAttribute('x', `${buildingCenterX}`);
+        subMob.setAttribute('y', `${subY}`);
       }
     }
   }
@@ -220,6 +246,15 @@ function initHeroScrub() {
 
     // Draw the frame
     ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
+
+    // Sync live frame rendering inside the knockout typography
+    if (koLiveImg) {
+      koLiveImg.setAttribute('href', getFrameUrl(frameIndex));
+      koLiveImg.setAttribute('x', `${drawX}`);
+      koLiveImg.setAttribute('y', `${drawY}`);
+      koLiveImg.setAttribute('width', `${drawW}`);
+      koLiveImg.setAttribute('height', `${drawH}`);
+    }
 
     // Feather top and bottom edges if letterboxed on mobile or portrait
     if (drawY > 0) {
@@ -362,18 +397,28 @@ function initHeroScrub() {
     }
   });
 
-  // MALIK & ASSOCIATES Hero Typography Trajectory:
+  // 1. Initial hero opening content slides up and dissolves as user begins scrolling (0 -> 0.22)
+  if (heroOpeningEl) {
+    heroTimeline.to(heroOpeningEl, {
+      y: -75,
+      opacity: 0,
+      ease: 'power1.out',
+      duration: 0.22
+    }, 0);
+  }
+
+  // 2. MALIK & ASSOCIATES Hero Typography Trajectory:
   // Starts centered over the courthouse architecture, slowly glides downward across the facade
-  // with a very subtle scale increase for depth, and smoothly dissolves into the Overview section.
+  // with a very subtle scale increase for depth, and smoothly dissolves into Chambers Perspective.
   if (koStageEl && koSvg) {
-    // 1. Initial emergence as the courthouse ascends through clouds (progress 0.10 -> 0.32)
+    // Emergence as the courthouse ascends into center view (progress 0.20 -> 0.35)
     heroTimeline.fromTo(koStageEl,
       { opacity: 0 },
-      { opacity: 1, ease: 'power1.out', duration: 0.22 },
-      0.10
+      { opacity: 1, ease: 'power1.out', duration: 0.15 },
+      0.20
     );
 
-    // 2. Slow, graceful downward drift across the courthouse facade with subtle scale increase for depth (progress 0.12 -> 0.78)
+    // Slow, graceful downward drift across the courthouse facade with subtle scale increase for depth (progress 0.20 -> 0.78)
     // Modest translation: 54px on desktop, 34px on mobile; scale from 1.0 to 1.032
     heroTimeline.fromTo(koSvg,
       { y: 0, scale: 1.0 },
@@ -381,12 +426,12 @@ function initHeroScrub() {
         y: () => (window.innerWidth < 860 ? 34 : 54),
         scale: 1.032,
         ease: 'sine.inOut',
-        duration: 0.66
+        duration: 0.58
       },
-      0.12
+      0.20
     );
 
-    // 3. Smooth dissolution toward the end of the hero sequence before entering the Overview section (progress 0.78 -> 0.96)
+    // Smooth dissolution toward the end of the hero sequence before entering Chambers Perspective (progress 0.78 -> 0.96)
     heroTimeline.to(koStageEl,
       { opacity: 0, ease: 'power1.in', duration: 0.18 },
       0.78
@@ -516,6 +561,49 @@ function initSmoothScroll() {
  * Subtle GSAP ScrollTrigger Editorial Reveals
  */
 function initEditorialScrollReveals() {
+  // 0. Chambers Perspective Parallax and Content Reveal
+  const perspectiveImg = document.getElementById('perspective-parallax-img');
+  if (perspectiveImg) {
+    gsap.fromTo(perspectiveImg,
+      { scale: 1.0, y: -25 },
+      {
+        scale: 1.06,
+        y: 25,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '#chambers-perspective',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
+      }
+    );
+  }
+
+  gsap.from('.perspective-editorial-header', {
+    scrollTrigger: {
+      trigger: '.perspective-editorial-header',
+      start: 'top 85%',
+      toggleActions: 'play none none none'
+    },
+    opacity: 0,
+    y: 30,
+    duration: 0.75,
+    ease: 'power2.out'
+  });
+
+  gsap.from('.perspective-callout', {
+    scrollTrigger: {
+      trigger: '.perspective-callout',
+      start: 'top 85%',
+      toggleActions: 'play none none none'
+    },
+    opacity: 0,
+    y: 25,
+    duration: 0.75,
+    ease: 'power2.out'
+  });
+
   // 1. Profile Band Items
   gsap.utils.toArray('.profile-band-item').forEach((item, i) => {
     gsap.from(item, {

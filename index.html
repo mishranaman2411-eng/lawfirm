@@ -20,9 +20,9 @@
     </div>
     
     <ul class="site-nav__links">
-      <li><a href="#firm-profile" class="site-nav__link">Overview</a></li>
-      <li><a href="#the-firm" class="site-nav__link">The Firm</a></li>
-      <li><a href="#practice-areas" class="site-nav__link">Practices</a></li>
+      <li><a href="#chambers-perspective" class="site-nav__link">Overview</a></li>
+      <li><a href="#the-firm" class="site-nav__link">The Firm <span class="nav-arrow">▾</span></a></li>
+      <li><a href="#practice-areas" class="site-nav__link">Practices <span class="nav-arrow">▾</span></a></li>
       <li><a href="#approach" class="site-nav__link">Doctrine</a></li>
       <li><a href="#advocates" class="site-nav__link">Advocates</a></li>
       <li><a href="#consultation" class="site-nav__link">Chambers</a></li>
@@ -30,7 +30,7 @@
 
     <div class="site-nav__actions">
       <a href="tel:+919560046503" class="site-nav__phone">+91-9560046503</a>
-      <a href="#consultation" class="site-nav__cta">Consultation</a>
+      <a href="#consultation" class="site-nav__cta">Consultation &rarr;</a>
     </div>
   </nav>
 
@@ -47,13 +47,6 @@
 
       <!-- Architectural HUD / Scroll Prompts -->
       <div class="hero-hud">
-        <div class="hero-hud__top">
-          <div class="hud-item hud-item--centered">
-            <span class="hud-dot"></span>
-            <span>APPELLATE &amp; COMMERCIAL CHAMBERS · DELHI NCR</span>
-          </div>
-        </div>
-
         <div class="hero-hud__bottom">
           <div class="hero-scroll-indicator">
             <div class="scroll-track-line">
@@ -64,24 +57,57 @@
         </div>
       </div>
 
+      <!-- Hero Opening Content (Matching Reference Initial State at p=0) -->
+      <div class="hero-opening-content" id="hero-opening-content">
+        <div class="hero-opening-kicker">APPELLATE &amp; COMMERCIAL CHAMBERS · DELHI NCR</div>
+        <h1 class="hero-opening-headline">Advocacy Built On Precision</h1>
+        <p class="hero-opening-subhead">
+          Supreme Court &amp; High Court Advocates. Strategic counsel across corporate, commercial, and complex appellate litigation.
+        </p>
+        <a href="#chambers-perspective" class="hero-pill-btn">
+          <span>Explore Chambers</span>
+          <span class="btn-arrow">&rarr;</span>
+        </a>
+      </div>
+
       <!-- Architectural Transparent Knockout Typography Stage -->
       <div class="hero-knockout-stage" id="hero-knockout-stage" aria-label="Malik &amp; Associates">
         <svg class="hero-knockout-svg" id="hero-knockout-svg" xmlns="http://www.w3.org/2000/svg">
-          <!-- Razor-sharp architectural see-through lettering revealing the courthouse & clouds -->
+          <defs>
+            <clipPath id="malik-clip">
+              <!-- Desktop clip text -->
+              <text id="ko-clip-desktop" class="ko-clip-text ko-desktop-text" text-anchor="middle" dominant-baseline="central">
+                MALIK
+              </text>
+              <!-- Mobile clip text -->
+              <text id="ko-clip-mob" class="ko-clip-text ko-mobile-text" text-anchor="middle" dominant-baseline="central" style="display:none">
+                MALIK
+              </text>
+            </clipPath>
+          </defs>
+
+          <!-- Live frame rendered directly inside the letters MALIK -->
+          <image id="ko-live-image" clip-path="url(#malik-clip)" preserveAspectRatio="none" />
+
+          <!-- Hairline architectural contour overlay for razor-sharp definition -->
           <text id="ko-contour-desktop" class="ko-contour ko-desktop-text" text-anchor="middle" dominant-baseline="central">
-            MALIK &amp; ASSOCIATES
+            MALIK
           </text>
-          <text id="ko-contour-mob-1" class="ko-contour ko-mobile-text" text-anchor="middle" dominant-baseline="central" style="display:none">
-            MALIK &amp;
+          <text id="ko-sub-desktop" class="ko-sub-label ko-desktop-text" text-anchor="middle" dominant-baseline="central">
+            &amp; ASSOCIATES
           </text>
-          <text id="ko-contour-mob-2" class="ko-contour ko-mobile-text" text-anchor="middle" dominant-baseline="central" style="display:none">
-            ASSOCIATES
+
+          <!-- Mobile contour & sub-label -->
+          <text id="ko-contour-mob" class="ko-contour ko-mobile-text" text-anchor="middle" dominant-baseline="central" style="display:none">
+            MALIK
+          </text>
+          <text id="ko-sub-mob" class="ko-sub-label ko-mobile-text" text-anchor="middle" dominant-baseline="central" style="display:none">
+            &amp; ASSOCIATES
           </text>
         </svg>
 
         <!-- Refined Editorial Meta Elements -->
         <div class="hero-knockout-meta">
-          <div class="hero-knockout-kicker">ADVOCATES &amp; LEGAL CONSULTANTS · DELHI &amp; GURUGRAM</div>
           <div class="hero-knockout-sub">Supreme Court of India · High Court of Delhi · Gurugram District Courts · NCLT</div>
         </div>
       </div>
@@ -93,6 +119,55 @@
 
     </div>
   </header>
+
+  <!-- ========================================================================
+       SECTION 1: CHAMBERS PERSPECTIVE (MATCHING REFERENCE EDITORIAL SPLIT + MEDIA)
+       ======================================================================== -->
+  <section class="section section-perspective" id="chambers-perspective">
+    <div class="section-container">
+      
+      <div class="perspective-editorial-header">
+        <div class="perspective-tag">
+          <span class="perspective-dot"></span>
+          <span>01 / CHAMBERS PERSPECTIVE</span>
+        </div>
+        <div class="perspective-heading-wrap">
+          <h2 class="perspective-main-heading">
+            When the stakes are constitutional or commercial, advocacy cannot be generic. It must be architectural.
+          </h2>
+          <p class="perspective-body">
+            For over two decades, Malik &amp; Associates has represented corporate enterprises, institutional bodies, property developers, and individuals across high-stakes appellate litigation, constitutional writs, commercial arbitration, and regulatory enforcement before the Supreme Court of India, Delhi High Court, and specialized tribunals.
+          </p>
+        </div>
+      </div>
+
+      <!-- Widescreen Cinematic Media Block with subtle rounded corners & parallax -->
+      <div class="perspective-media-block">
+        <div class="media-frame-wrapper" id="perspective-media-frame">
+          <img 
+            src="/assets/courthouse-frames/frame_0185.webp" 
+            alt="Chambers Architectural High Court Colonnade" 
+            class="media-parallax-img" 
+            id="perspective-parallax-img"
+            loading="lazy"
+          />
+          <div class="media-overlay-gradient"></div>
+          <div class="media-caption-badge">
+            <span class="badge-dot"></span>
+            <span>SUPREME COURT OF INDIA &amp; DELHI HIGH COURT · BENCH ADMISSIONS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Centered Manifesto Statement (Matching Reference) -->
+      <div class="perspective-callout">
+        <p class="callout-statement">
+          &ldquo;This isn't just courtroom counsel. This is decisive legal strategy.&rdquo;
+        </p>
+      </div>
+
+    </div>
+  </section>
 
   <!-- ========================================================================
        CHAMBERS PROFILE & JURISDICTIONS (EDITORIAL HORIZONTAL BAND)
@@ -138,7 +213,7 @@
       <div class="editorial-split-header">
         <div class="eyebrow-tag">
           <span class="eyebrow-dot"></span>
-          <span>01 / The Firm</span>
+          <span>02 / The Firm</span>
         </div>
         <h2 class="editorial-main-heading">
           Judicial Rigor. Strategic Foresight. Resolute Advocacy.
@@ -227,7 +302,7 @@
         <div class="practice-intro-col">
           <div class="eyebrow-tag">
             <span class="eyebrow-dot"></span>
-            <span>02 / Practice Disciplines</span>
+            <span>03 / Practice Disciplines</span>
           </div>
           <h2 class="editorial-main-heading">
             Focused Representation Across Five Key Civil &amp; Corporate Fields
@@ -417,7 +492,7 @@
       <div class="text-center max-w-3xl mx-auto mb-16">
         <div class="eyebrow-tag eyebrow-tag--light justify-center">
           <span class="eyebrow-dot"></span>
-          <span>03 / Litigation Doctrine</span>
+          <span>04 / Litigation Doctrine</span>
           <span class="eyebrow-dot"></span>
         </div>
         <h2 class="editorial-main-heading text-ivory">
@@ -471,7 +546,7 @@
       <div class="text-center max-w-3xl mx-auto mb-16">
         <div class="eyebrow-tag justify-center">
           <span class="eyebrow-dot"></span>
-          <span>04 / Advocates</span>
+          <span>05 / Advocates</span>
           <span class="eyebrow-dot"></span>
         </div>
         <h2 class="editorial-main-heading">
@@ -622,7 +697,7 @@
       <div class="text-center max-w-3xl mx-auto mb-14">
         <div class="eyebrow-tag justify-center">
           <span class="eyebrow-dot"></span>
-          <span>05 / Consultation &amp; Offices</span>
+          <span>06 / Consultation &amp; Offices</span>
           <span class="eyebrow-dot"></span>
         </div>
         <h2 class="editorial-main-heading">
