@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initConsultationAppointmentForm();
   initSmoothScroll();
   initEditorialScrollReveals();
+  init3DCardTilt();
 });
 
 /**
@@ -580,13 +581,34 @@ function initEditorialScrollReveals() {
       );
     }
     if (advCards.length) {
-      advCards.forEach((card, idx) => {
-        advTl.fromTo(
-          card,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
-          idx === 0 ? '-=0.15' : '-=0.45'
-        );
+      // 4. Scroll animation: Cards stagger in as user scrolls (fade + 20px rise, 100ms apart)
+      advTl.fromTo(
+        advCards,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1, // Exactly 100ms apart
+          ease: 'power2.out'
+        },
+        '-=0.25'
+      );
+    }
+
+    // Subtle 3D background watermark parallax
+    const advWatermark = advocatesSection.querySelector('.advocates-judicial-watermark');
+    if (advWatermark) {
+      gsap.to(advWatermark, {
+        y: 50,
+        rotation: -4,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: advocatesSection,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true
+        }
       });
     }
   }
@@ -826,4 +848,66 @@ function initEditorialScrollReveals() {
       );
     }
   }
+}
+
+/**
+ * 6. Subtle 3D Card Tilt Toward Cursor
+ * Tactile, restrained 3D card tilt with specular glare lighting on hover.
+ */
+function init3DCardTilt() {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const cards = document.querySelectorAll('.advocate-profile-card');
+  cards.forEach((card) => {
+    let bounds = null;
+    const glare = card.querySelector('.card-glare');
+
+    gsap.set(card, { transformPerspective: 1200, transformStyle: 'preserve-3d' });
+
+    function onPointerMove(e) {
+      if (!bounds) bounds = card.getBoundingClientRect();
+      const x = e.clientX - bounds.left;
+      const y = e.clientY - bounds.top;
+
+      const xNorm = Math.max(-1, Math.min(1, (x / bounds.width - 0.5) * 2));
+      const yNorm = Math.max(-1, Math.min(1, (y / bounds.height - 0.5) * 2));
+
+      // Subtle tilt: max 5 deg rotation
+      const rotateX = -yNorm * 5;
+      const rotateY = xNorm * 5;
+
+      gsap.to(card, {
+        rotationX: rotateX,
+        rotationY: rotateY,
+        y: -6,
+        duration: 0.22,
+        ease: 'power1.out',
+        overwrite: 'auto'
+      });
+
+      if (glare) {
+        const xPct = ((x / bounds.width) * 100).toFixed(1);
+        const yPct = ((y / bounds.height) * 100).toFixed(1);
+        glare.style.background = `radial-gradient(circle at ${xPct}% ${yPct}%, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0) 65%)`;
+      }
+    }
+
+    card.addEventListener('pointerenter', () => {
+      bounds = card.getBoundingClientRect();
+    });
+
+    card.addEventListener('pointermove', onPointerMove);
+
+    card.addEventListener('pointerleave', () => {
+      bounds = null;
+      gsap.to(card, {
+        rotationX: 0,
+        rotationY: 0,
+        y: 0,
+        duration: 0.55,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    });
+  });
 }
