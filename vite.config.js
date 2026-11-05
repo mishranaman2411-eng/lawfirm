@@ -4,7 +4,10 @@ export default defineConfig({
   server: {
     port: 5173,
     open: false,
-    host: true
+    host: true,
+    watch: {
+      ignored: ['**/dist/**', '**/test_*.png']
+    }
   },
   build: {
     target: 'esnext',

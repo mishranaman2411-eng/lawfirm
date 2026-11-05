@@ -693,22 +693,20 @@ function initEditorialScrollReveals() {
   }
 
   // 4. Practice Areas Section (#practice-areas)
-  // Animate ONLY the heading "Focused Counsel. Five Core Disciplines." with line-by-line masked reveal
-  const practiceHeading = document.querySelector('#practice-areas .editorial-main-heading');
-  if (practiceHeading) {
-    const practiceLines = practiceHeading.querySelectorAll('.reveal-line');
+  // Animate ONLY the introductory paragraph with a subtle fade-in and slight upward movement
+  const practiceDesc = document.querySelector('#practice-areas .practice-intro-desc');
+  if (practiceDesc) {
     gsap.fromTo(
-      practiceLines,
+      practiceDesc,
       {
-        y: '115%',
-        opacity: 0
+        opacity: 0,
+        y: 20
       },
       {
-        y: '0%',
         opacity: 1,
-        duration: 0.85,
-        stagger: 0.12,
-        ease: 'power3.out',
+        y: 0,
+        duration: 0.8,
+        ease: 'power2.out',
         scrollTrigger: {
           trigger: '#practice-areas',
           start: 'top 80%',
