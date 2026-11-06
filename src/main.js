@@ -108,6 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initMobileNav();
   initHeroScrub();
   initDrawers();
+  initInteractiveMatterScrubber();
+  initInteractiveDoctrinePleading();
   initConsultationAppointmentForm();
   initSmoothScroll();
   initEditorialScrollReveals();
@@ -958,6 +960,225 @@ function initBackToTop() {
 /**
  * Confidential Consultation Appointment Form Handler
  */
+/**
+ * Interactive Matter Scrubber: Walk a matter through court
+ * Inspired by malik-interactive.html, elevated with luxury architectural styling
+ */
+function initInteractiveMatterScrubber() {
+  const scroller = document.getElementById('matter-scroller');
+  const picker = document.getElementById('matter-picker');
+  const trackRow = document.getElementById('matter-track-row');
+  const fill = document.getElementById('matter-track-fill');
+  const whereEl = document.getElementById('matter-detail-where');
+  const titleEl = document.getElementById('matter-detail-title');
+  const descEl = document.getElementById('matter-detail-desc');
+  const hintEl = document.getElementById('matter-scroll-hint');
+
+  if (!scroller || !picker || !trackRow) return;
+
+  const MATTERS = [
+    {
+      name: 'Commercial Litigation',
+      steps: [
+        ['Pre-suit review', 'Chambers', 'We inspect contracts, correspondence, and payment ledgers before issuing a formal demand notice under statute.'],
+        ['Plaint & indexing', 'Delhi High Court', 'The commercial suit is drafted with an exhaustive document schedule, statement of truth, and urgent listing application.'],
+        ['Interim relief', 'Commercial Bench', 'We press for an ad-interim injunction or asset freeze to protect client rights while the dispute proceeds.'],
+        ['Trial & arguments', 'Commercial Court', 'Concise propositions of law grounded in the Commercial Courts Act and binding precedents.'],
+        ['Decree or settlement', 'Commercial Decree', 'A formal decree on merits, or a judicially recorded settlement if that serves business objectives faster.']
+      ]
+    },
+    {
+      name: 'Property & HARERA',
+      steps: [
+        ['Title forensics', 'Chambers', 'We audit builder-buyer agreements, allotment letters, and payment receipts before issuing statutory notice.'],
+        ['Complaint filing', 'HARERA Gurugram', 'A formal complaint or civil suit is registered with indexed evidence and escrow compliance records.'],
+        ['Interim stay', 'Authority Bench', 'We press for an immediate stay or status quo to prevent third-party property transfers or coercive cancellation.'],
+        ['Oral arguments', 'Regulatory Bench', 'Fact-based oral submissions and cross-examination on project delay milestones and sanctioned plans.'],
+        ['Possession or refund', 'Final Order', 'An enforceable order for physical possession, delayed-period interest, or refund with execution warrants.']
+      ]
+    },
+    {
+      name: 'Commercial Arbitration',
+      steps: [
+        ['Section 21 notice', 'Chambers', 'We draft and serve the formal notice invoking the arbitration agreement and identifying core claims.'],
+        ['Section 9 protection', 'Delhi High Court', 'Urgent petition for security of amount in dispute, bank guarantee stays, or asset preservation.'],
+        ['Tribunal constitution', 'Appellate Bench / DIAC', 'Section 11 application for arbitrator appointment, or formal institution before arbitral centres.'],
+        ['Statement of claim', 'Arbitral Tribunal', 'Pleadings, witness affidavits, and expert quantum reports submitted under strict procedural orders.'],
+        ['Award & enforcement', 'Commercial Division', 'A reasoned arbitral award, defended or enforced under Section 34/36 of the Arbitration Act.']
+      ]
+    },
+    {
+      name: 'Insolvency & NCLT',
+      steps: [
+        ['Section 8 notice', 'Chambers', 'Statutory demand notice demanding repayment with proof of invoices and debt crystallization.'],
+        ['Section 7/9 petition', 'NCLT New Delhi', 'Insolvency petition supported by bank certificates, debt ledgers, and proof of operational default.'],
+        ['Admission hearing', 'Tribunal Bench', 'Focused arguments establishing undisputed default, seeking formal admission into resolution.'],
+        ['Moratorium order', 'NCLT Bench', 'Imposition of Section 14 statutory moratorium, safeguarding debtor assets during resolution.'],
+        ['Resolution or exit', 'Judicial Order', 'Approval of a compliant resolution plan, or formal Section 12A withdrawal upon structured settlement.']
+      ]
+    }
+  ];
+
+  let currentCategory = 0;
+  let activeStepIndex = -1;
+
+  function calculateTotalScroll() {
+    return Math.max(1, scroller.offsetHeight - window.innerHeight);
+  }
+
+  function calculateProgress() {
+    const rect = scroller.getBoundingClientRect();
+    const topOffset = rect.top - 80; // Offset by header height
+    const total = calculateTotalScroll();
+    return Math.max(0, Math.min(1, (-topOffset / total) * 1.05));
+  }
+
+  function renderCategory(index) {
+    currentCategory = index;
+    activeStepIndex = -1;
+
+    // Update picker buttons
+    picker.querySelectorAll('.matter-pick-btn').forEach((btn, k) => {
+      btn.setAttribute('aria-pressed', k === index ? 'true' : 'false');
+    });
+
+    // Remove existing nodes
+    trackRow.querySelectorAll('.matter-node').forEach((n) => n.remove());
+
+    // Build timeline nodes
+    MATTERS[index].steps.forEach((step, k) => {
+      const nodeBtn = document.createElement('button');
+      nodeBtn.className = 'matter-node';
+      nodeBtn.setAttribute('type', 'button');
+      nodeBtn.setAttribute('aria-label', `Step ${k + 1}: ${step[0]} at ${step[1]}`);
+      nodeBtn.innerHTML = `<span class="matter-dot" aria-hidden="true"></span><b>${step[0]}</b><small>${step[1]}</small>`;
+
+      nodeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const rawProgress = (k / 4 + 0.01) / 1.05;
+        const targetScrollTop = scroller.getBoundingClientRect().top + window.scrollY - 80 + rawProgress * calculateTotalScroll();
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({
+          top: targetScrollTop,
+          behavior: prefersReduced ? 'auto' : 'smooth'
+        });
+      });
+
+      trackRow.appendChild(nodeBtn);
+    });
+
+    updateScrollState();
+  }
+
+  function updateScrollState() {
+    const p = calculateProgress();
+    const k = Math.min(4, Math.floor(p * 4 + 0.05));
+
+    if (fill) {
+      fill.style.setProperty('--p', `${(p * 100).toFixed(1)}%`);
+    }
+
+    if (hintEl) {
+      hintEl.style.opacity = p > 0.05 && p < 0.92 ? '0' : '1';
+      hintEl.innerHTML = p >= 0.92 ? '<span>Procedural cycle complete</span>' : '<span>Scroll to advance matter</span> <span class="hint-arrow">&darr;</span>';
+    }
+
+    if (k === activeStepIndex) return;
+    activeStepIndex = k;
+
+    const currentStep = MATTERS[currentCategory].steps[k];
+    const nodes = trackRow.querySelectorAll('.matter-node');
+
+    nodes.forEach((n, j) => {
+      n.classList.toggle('done', j <= k);
+      n.classList.toggle('cur', j === k);
+    });
+
+    if (whereEl) whereEl.textContent = currentStep[1];
+    if (titleEl) titleEl.textContent = currentStep[0];
+    if (descEl) descEl.textContent = currentStep[2];
+  }
+
+  // Populate picker buttons
+  MATTERS.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'matter-pick-btn';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('role', 'tab');
+    btn.textContent = item.name;
+    btn.addEventListener('click', () => renderCategory(i));
+    picker.appendChild(btn);
+  });
+
+  window.addEventListener('scroll', updateScrollState, { passive: true });
+  window.addEventListener('resize', updateScrollState, { passive: true });
+
+  renderCategory(0);
+}
+
+/**
+ * Interactive Court Pleading Brief: Read a pleading the way we write one
+ * Inspired by malik-interactive.html, elevated with authentic courtroom typography & highlighter sweep
+ */
+function initInteractiveDoctrinePleading() {
+  const container = document.getElementById('approach');
+  const prsList = document.getElementById('pleading-principles-list');
+  const paper = document.getElementById('pleading-paper');
+  const noteEl = document.getElementById('pleading-note');
+
+  if (!container || !prsList || !paper || !noteEl) return;
+
+  const marks = paper.querySelectorAll('.pleading-mark');
+
+  const PRINCIPLES = [
+    {
+      title: 'Evidentiary precision',
+      desc: 'Every factual assertion cites document and page number. If it cannot be proven by indexed admissible evidence, it does not go into court pleadings.'
+    },
+    {
+      title: 'Focused courtroom advocacy',
+      desc: 'One statutory rule, one contract clause. The judicial bench never has to search for our legal proposition amid crowded daily causelists.'
+    },
+    {
+      title: 'Commercial realism',
+      desc: 'Litigation serves business strategy. We formulate practical settlement pathways before prolonged hearings begin, protecting client commercial viability.'
+    }
+  ];
+
+  function selectPrinciple(index) {
+    prsList.querySelectorAll('.pleading-pr-btn').forEach((btn, i) => {
+      btn.classList.toggle('on', i === index);
+      btn.setAttribute('aria-selected', i === index ? 'true' : 'false');
+    });
+
+    marks.forEach((mark) => {
+      const k = parseInt(mark.getAttribute('data-k'), 10);
+      mark.classList.toggle('on', k === index);
+    });
+
+    paper.classList.add('has-on');
+
+    const p = PRINCIPLES[index];
+    noteEl.innerHTML = `<strong>${p.title}</strong><span>${p.desc}</span>`;
+  }
+
+  PRINCIPLES.forEach((item, k) => {
+    const btn = document.createElement('button');
+    btn.className = 'pleading-pr-btn';
+    btn.setAttribute('type', 'button');
+    btn.setAttribute('role', 'tab');
+    btn.textContent = item.title;
+
+    btn.addEventListener('mouseenter', () => selectPrinciple(k));
+    btn.addEventListener('focus', () => selectPrinciple(k));
+    btn.addEventListener('click', () => selectPrinciple(k));
+
+    prsList.appendChild(btn);
+  });
+
+  selectPrinciple(0);
+}
+
 function initConsultationAppointmentForm() {
   const form = document.getElementById('consultation-intake-form');
   const container = document.getElementById('consultation-mcq-container');
@@ -1326,40 +1547,43 @@ function initEditorialScrollReveals() {
   // 3. Firm Statistics Section (#firm-statistics)
   const statsSection = document.getElementById('firm-statistics');
   if (statsSection) {
-    const sLines = statsSection.querySelectorAll('.reveal-line');
-    const sDesc = statsSection.querySelector('.stats-intro-desc');
-    const sCards = statsSection.querySelectorAll('.stat-card');
+    const sCards = statsSection.querySelectorAll('.matter-fact-card');
+    const sNote = statsSection.querySelector('.matter-compliance-note');
 
-    const statsTl = gsap.timeline({
-      scrollTrigger: {
-        trigger: statsSection,
-        start: 'top 80%',
-        end: 'bottom 10%',
-        toggleActions: 'play reverse play reverse'
-      }
-    });
-
-    if (sLines.length) {
-      statsTl.fromTo(
-        sLines,
-        { y: '115%', opacity: 0 },
-        { y: '0%', opacity: 1, duration: 0.85, stagger: 0.12, ease: 'power3.out' }
-      );
-    }
-    if (sDesc) {
-      statsTl.fromTo(
-        sDesc,
-        { opacity: 0, y: 16 },
-        { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' },
-        '-=0.4'
-      );
-    }
     if (sCards.length) {
-      statsTl.fromTo(
+      gsap.fromTo(
         sCards,
         { opacity: 0, y: 22 },
-        { opacity: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out' },
-        '-=0.2'
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.matter-after-section',
+            start: 'top 85%',
+            end: 'bottom 15%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
+      );
+    }
+    if (sNote) {
+      gsap.fromTo(
+        sNote,
+        { opacity: 0, y: 16 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: sNote,
+            start: 'top 90%',
+            toggleActions: 'play reverse play reverse'
+          }
+        }
       );
     }
   }
@@ -1368,8 +1592,8 @@ function initEditorialScrollReveals() {
   const doctrineSection = document.getElementById('approach');
   if (doctrineSection) {
     const dEyebrow = doctrineSection.querySelector('.eyebrow-tag');
-    const dLines = doctrineSection.querySelectorAll('.editorial-main-heading .reveal-line');
-    const dCols = doctrineSection.querySelectorAll('.doctrine-col');
+    const dTitle = doctrineSection.querySelector('.editorial-main-heading');
+    const dGrid = doctrineSection.querySelector('.pleading-interactive-grid');
 
     const doctrineTl = gsap.timeline({
       scrollTrigger: {
@@ -1380,11 +1604,11 @@ function initEditorialScrollReveals() {
       }
     });
 
-    if (dLines.length) {
+    if (dTitle) {
       doctrineTl.fromTo(
-        dLines,
-        { y: '115%', opacity: 0 },
-        { y: '0%', opacity: 1, duration: 0.85, stagger: 0.12, ease: 'power3.out' }
+        dTitle,
+        { y: 24, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }
       );
     }
     if (dEyebrow) {
@@ -1395,17 +1619,13 @@ function initEditorialScrollReveals() {
         '-=0.5'
       );
     }
-    if (dCols.length) {
-      dCols.forEach((col, idx) => {
-        const num = col.querySelector('.doctrine-num');
-        const text = col.querySelector('.doctrine-text-content') || col;
-        doctrineTl.fromTo(
-          [num, text].filter(Boolean),
-          { opacity: 0, y: 22 },
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
-          idx === 0 ? '-=0.2' : '-=0.42'
-        );
-      });
+    if (dGrid) {
+      doctrineTl.fromTo(
+        dGrid,
+        { opacity: 0, y: 22 },
+        { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out' },
+        '-=0.25'
+      );
     }
   }
 

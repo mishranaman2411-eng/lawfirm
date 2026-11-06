@@ -718,157 +718,157 @@
     </div>
   </section>
 
-  <!-- 3. FIRM STATISTICS -->
-  
+  <!-- 3. FIRM STATISTICS & MATTER SCRUBBER -->
   <!-- ========================================================================
-       SECTION 3: FIRM STATISTICS (CHAMBERS METRICS & TRACK RECORD)
+       SECTION 3: CHAMBERS TRACK RECORD (INTERACTIVE MATTER WALKTHROUGH)
        ======================================================================== -->
   <section class="section-statistics" id="firm-statistics">
-    <div class="section-container">
-      
-      <div class="track-record-split-layout">
-        
-        <!-- Sticky Column on Desktop: Offset by fixed nav header height (80px + 2rem) -->
-        <aside class="track-record-sticky-col">
-          <div class="eyebrow-tag eyebrow-tag--light">
-            <span class="eyebrow-dot"></span>
-            <span>03 / Chambers Track Record</span>
-            <span class="eyebrow-dot"></span>
+    
+    <div class="matter-scroller-container" id="matter-scroller">
+      <div class="matter-stick-panel">
+        <div class="section-container">
+          
+          <div class="matter-header-block">
+            <div class="eyebrow-tag eyebrow-tag--light">
+              <span class="eyebrow-dot"></span>
+              <span>03 / Chambers Track Record</span>
+              <span class="eyebrow-dot"></span>
+            </div>
+            <h2 class="editorial-main-heading text-ivory">
+              Pick a dispute. Scroll to take it through court.
+            </h2>
+            <p class="stats-intro-desc">
+              Choose the kind of matter, then scroll. The case moves from first notice to final order as you go.
+            </p>
           </div>
-          <h2 class="editorial-main-heading text-ivory reveal-heading">
-            <span class="reveal-line-wrap"><span class="reveal-line">Measured by precedent.</span></span>
-            <span class="reveal-line-wrap"><span class="reveal-line">Proven in court.</span></span>
-          </h2>
-          <p class="stats-intro-desc">
-            Decades of continuous litigation, procedural discipline, and ethical advocacy across Delhi NCR and appellate courts.
+
+          <!-- Dispute Category Picker -->
+          <div class="matter-picker" id="matter-picker" role="tablist" aria-label="Select Legal Dispute Type"></div>
+
+          <!-- Interactive Track Timeline -->
+          <div class="matter-track-row" id="matter-track-row" role="region" aria-label="Procedural Timeline">
+            <div class="matter-track-line" aria-hidden="true">
+              <div class="matter-track-fill" id="matter-track-fill"></div>
+            </div>
+          </div>
+
+          <!-- Dynamic Detail Box -->
+          <div class="matter-detail-card" id="matter-detail-card" aria-live="polite">
+            <div class="matter-detail-left">
+              <span class="matter-detail-where" id="matter-detail-where">Chambers</span>
+              <h3 class="matter-detail-title" id="matter-detail-title">Pre-suit review</h3>
+            </div>
+            <p class="matter-detail-desc" id="matter-detail-desc">
+              We examine contracts, correspondence, and financial ledgers before issuing a formal demand notice under statute.
+            </p>
+          </div>
+
+          <p class="matter-scroll-hint" id="matter-scroll-hint">
+            <span>Scroll to advance matter</span> <span class="hint-arrow">&darr;</span>
           </p>
 
-          <div class="track-record-standing-box">
-            <div class="standing-box-header">
-              <span class="standing-box-crest">BCI</span>
-              <span class="standing-box-title">Rule 36 compliance</span>
-            </div>
-            <p class="standing-box-text">
-              In accordance with Rule 36 of the Bar Council of India Rules and the Advocates Act, 1961, our chambers do not solicit briefs or publish case outcome statistics. Professional standing is established through judicial performance and reported precedent.
-            </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Verified Institutional Standing & Bar Council Compliance -->
+    <div class="matter-after-section">
+      <div class="section-container">
+        <div class="matter-facts-grid">
+          <div class="matter-fact-card">
+            <strong class="matter-fact-val">20+</strong>
+            <span class="matter-fact-lbl">Years of continuous practice</span>
+            <p class="matter-fact-sub">Appellate &amp; commercial courts since early 2000s</p>
           </div>
-        </aside>
-
-        <!-- Scrolling Cards Column with Bar-Compliant, Verified Credentials (No [To Be Verified] placeholders) -->
-        <div class="track-record-cards-col">
-          
-          <article class="stat-card" tabindex="0">
-            <div class="stat-card-top">
-              <span class="stat-value">20+</span>
-              <span class="stat-badge">Continuous practice</span>
-            </div>
-            <h3 class="stat-label">Years of continuous practice</h3>
-            <p class="stat-desc">
-              Senior advocacy and dispute resolution across the Supreme Court of India, Delhi High Court, and district trial courts across Delhi and Haryana since the early 2000s.
-            </p>
-          </article>
-
-          <article class="stat-card" tabindex="0">
-            <div class="stat-card-top">
-              <span class="stat-value">2</span>
-              <span class="stat-badge">Dual chambers</span>
-            </div>
-            <h3 class="stat-label">Chambers in New Delhi &amp; Gurugram</h3>
-            <p class="stat-desc">
-              Litigation chambers opposite the Delhi High Court for appellate matters, and corporate dispute chambers in Sector 29, Gurugram for commercial and real estate clients.
-            </p>
-          </article>
-
-          <article class="stat-card" tabindex="0">
-            <div class="stat-card-top">
-              <span class="stat-value">4</span>
-              <span class="stat-badge">Dedicated advocates</span>
-            </div>
-            <h3 class="stat-label">Advocates &amp; specialist counsel</h3>
-            <p class="stat-desc">
-              Led by Managing Partner Adv. Sapna Malik, combining appellate counsel, commercial arbitration specialists, and tribunal advocates working as a dedicated team.
-            </p>
-          </article>
-
-          <article class="stat-card" tabindex="0">
-            <div class="stat-card-top">
-              <span class="stat-value">4</span>
-              <span class="stat-badge">Primary forums</span>
-            </div>
-            <h3 class="stat-label">Direct bench admissions</h3>
-            <p class="stat-desc">
-              Active appearance rights before the Supreme Court of India, High Court of Delhi, National Company Law Tribunal (NCLT), and Haryana Real Estate Regulatory Authority (HARERA).
-            </p>
-          </article>
-
-          <article class="stat-card" tabindex="0">
-            <div class="stat-card-top">
-              <span class="stat-value">100%</span>
-              <span class="stat-badge">Client confidentiality</span>
-            </div>
-            <h3 class="stat-label">Conflict check before engagement</h3>
-            <p class="stat-desc">
-              Every matter undergoes formal internal conflict clearance prior to counsel appointment, ensuring legal professional privilege and strict ethical independence.
-            </p>
-          </article>
-
+          <div class="matter-fact-card">
+            <strong class="matter-fact-val">4</strong>
+            <span class="matter-fact-lbl">Dedicated advocates</span>
+            <p class="matter-fact-sub">Specialist appellate &amp; tribunal counsel</p>
+          </div>
+          <div class="matter-fact-card">
+            <strong class="matter-fact-val">2</strong>
+            <span class="matter-fact-lbl">Primary chambers</span>
+            <p class="matter-fact-sub">Opposite Delhi High Court &amp; Sector 29 Gurugram</p>
+          </div>
+          <div class="matter-fact-card">
+            <strong class="matter-fact-val">4</strong>
+            <span class="matter-fact-lbl">Primary forum admissions</span>
+            <p class="matter-fact-sub">Supreme Court, High Court, NCLT, HARERA</p>
+          </div>
         </div>
 
+        <div class="matter-compliance-note">
+          <div class="compliance-badge">RULE 36 BCI</div>
+          <p class="compliance-text">
+            In strict adherence to the Advocates Act, 1961 and Bar Council of India guidelines, our chambers do not advertise case success counts, win percentages, or settlement values. The procedural stages above illustrate real courtroom pathways across Delhi NCR and appellate courts.
+          </p>
+        </div>
       </div>
-
     </div>
+
   </section>
 
 
   <!-- 4. LITIGATION DOCTRINE -->
+  <!-- ========================================================================
+       SECTION 4: LITIGATION DOCTRINE (INTERACTIVE PLEADING BRIEF)
+       ======================================================================== -->
   <section class="section section--espresso" id="approach">
     <div class="section-container">
       
-      <div class="text-center max-w-3xl mx-auto mb-16">
-        <div class="eyebrow-tag eyebrow-tag--light justify-center">
+      <div class="doctrine-header-block">
+        <div class="eyebrow-tag eyebrow-tag--light">
           <span class="eyebrow-dot"></span>
           <span>04 / Litigation Doctrine</span>
           <span class="eyebrow-dot"></span>
         </div>
-        <h2 class="editorial-main-heading text-ivory reveal-heading">
-          <span class="reveal-line-wrap"><span class="reveal-line">Precision in procedure.</span></span>
-          <span class="reveal-line-wrap"><span class="reveal-line">Rigour in argument.</span></span>
+        <h2 class="editorial-main-heading text-ivory">
+          Read a pleading the way we write one.
         </h2>
-        <p class="stats-intro-desc text-center">
-          Our working doctrine combines procedural accuracy with realistic commercial judgment.
+        <p class="stats-intro-desc">
+          This is an illustrative pleading extract from our commercial practice. Pick a principle below to see it at work in the text.
         </p>
       </div>
 
-      <div class="doctrine-columns-grid">
+      <div class="pleading-interactive-grid">
         
-        <div class="doctrine-col" tabindex="0">
-          <div class="doctrine-num">I</div>
-          <div class="doctrine-text-content">
-            <h3 class="doctrine-title">Pre-trial evidentiary forensics</h3>
-            <p class="doctrine-desc">
-              Most disputes are decided on documents long before oral arguments begin. We inspect original contracts, correspondence, and financial records to construct an airtight evidentiary foundation before filing.
-            </p>
-          </div>
-        </div>
+        <!-- Left: Principle Selectors -->
+        <div class="pleading-principles-col" id="pleading-principles-list" role="tablist" aria-label="Litigation Principles"></div>
 
-        <div class="doctrine-col" tabindex="0">
-          <div class="doctrine-num">II</div>
-          <div class="doctrine-text-content">
-            <h3 class="doctrine-title">Focused courtroom advocacy</h3>
-            <p class="doctrine-desc">
-              Judicial benches manage crowded daily causelists. We present concise propositions of law, cite binding precedents with precision, and address the court's core questions without extraneous arguments.
-            </p>
-          </div>
-        </div>
+        <!-- Right: Court Pleading Paper & Annotation Note -->
+        <div class="pleading-document-col">
+          <article class="pleading-paper" id="pleading-paper">
+            <header class="pleading-paper-header">
+              <span class="pleading-paper-crest">HIGH COURT OF DELHI · COMMERCIAL DIVISION</span>
+              <span class="pleading-paper-caption">IN THE HIGH COURT OF DELHI AT NEW DELHI</span>
+              <span class="pleading-paper-suit">COMMERCIAL SUIT (OS) NO. 142 OF 2026</span>
+              <em class="pleading-paper-disclaimer">Sample extract for illustration of drafting doctrine only</em>
+            </header>
 
-        <div class="doctrine-col" tabindex="0">
-          <div class="doctrine-num">III</div>
-          <div class="doctrine-text-content">
-            <h3 class="doctrine-title">Commercial realism and remedies</h3>
-            <p class="doctrine-desc">
-              Litigation is an instrument to solve business disputes, not prolong them. We help clients evaluate interim injunctions, assess settlement opportunities realistically, and pursue remedies that protect commercial viability.
-            </p>
-          </div>
+            <div class="pleading-averments">
+              <p class="pleading-p">
+                <span class="pleading-para-num">1.</span>
+                <span>That the Plaintiff duly performed all supply obligations under the Master Commercial Agreement, and <mark data-k="0" class="pleading-mark">the verified delivery schedule is placed at page 14 of Annexure P-2, with the Defendant's signed acknowledgment of receipt placed on record at Annexure P-3.</mark></span>
+              </p>
+
+              <p class="pleading-p">
+                <span class="pleading-para-num">2.</span>
+                <span>That <mark data-k="1" class="pleading-mark">the Defendant's obligation to release milestone payments is governed strictly by Clause 7.2 of the contract, and an unconditional covenant to pay cannot be defeated by post-facto commercial disputes raised after expiry of the cure period.</mark></span>
+              </p>
+
+              <p class="pleading-p">
+                <span class="pleading-para-num">3.</span>
+                <span>That <mark data-k="2" class="pleading-mark">without prejudice to its statutory rights under Section 9 of the Act, the Plaintiff remains willing to explore a structured two-stage payment schedule through court-assisted mediation to avoid prolonged litigation and preserve commercial viability.</mark></span>
+              </p>
+            </div>
+
+            <div class="pleading-watermark" aria-hidden="true">
+              MALIK &amp; ASSOCIATES · CHAMBERS BRIEF
+            </div>
+          </article>
+
+          <!-- Doctrine Commentary Note Box -->
+          <div class="pleading-note-card" id="pleading-note" aria-live="polite"></div>
         </div>
 
       </div>

@@ -1682,173 +1682,593 @@ button {
 /* ==========================================================================
    FIRM STATISTICS (METRICS & TRACK RECORD)
    ========================================================================== */
+/* ==========================================================================
+   SECTION 3: INTERACTIVE MATTER COURT SCRUBBER
+   Inspired by malik-interactive.html, elevated with luxury architectural styling
+   ========================================================================== */
 .section-statistics {
   background: var(--espresso);
   color: var(--ivory);
-  padding: 6.5rem 0;
+  padding: 0;
   position: relative;
   border-top: 1px solid rgba(230, 224, 213, 0.08);
   border-bottom: 1px solid rgba(230, 224, 213, 0.08);
 }
 
-.track-record-split-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.35fr;
-  gap: clamp(2.5rem, 5vw, 4.5rem);
-  align-items: start;
+.matter-scroller-container {
+  height: 350vh;
+  position: relative;
 }
 
-.track-record-sticky-col {
+.matter-stick-panel {
   position: -webkit-sticky;
   position: sticky;
-  top: calc(80px + 2rem);
-  align-self: start;
+  top: 80px;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 0 3rem;
+  box-sizing: border-box;
+  z-index: 5;
 }
 
-.track-record-sticky-col .stats-intro-desc {
+.matter-header-block {
+  max-width: 850px;
+  margin-bottom: 1.5rem;
+}
+
+.matter-header-block h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-top: 0.8rem;
+}
+
+.matter-header-block .stats-intro-desc {
   font-size: 1.05rem;
-  line-height: 1.68;
+  line-height: 1.6;
   color: var(--ink-light-muted);
-  margin-top: 1.25rem;
+  margin-top: 0.8rem;
+  max-width: 65ch;
+}
+
+/* Category Picker */
+.matter-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.track-record-standing-box {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(230, 224, 213, 0.09);
-  border-left: 2px solid var(--accent-gold);
-  padding: 1.35rem 1.6rem;
-  margin-top: 1.5rem;
-}
-
-.standing-box-header {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  margin-bottom: 0.6rem;
-}
-
-.standing-box-crest {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  padding: 0.18rem 0.45rem;
-  background: rgba(197, 160, 89, 0.15);
-  color: var(--accent-gold);
-  border: 1px solid rgba(197, 160, 89, 0.3);
-}
-
-.standing-box-title {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ivory);
-  font-weight: 600;
-}
-
-.standing-box-text {
-  font-size: 0.84rem;
-  line-height: 1.58;
-  color: var(--ink-light-muted);
-}
-
-.track-record-cards-col {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.stat-card {
-  padding: 2.2rem 2rem;
+.matter-pick-btn {
+  padding: 0.65rem 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(230, 224, 213, 0.08);
-  border-radius: 4px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.35s ease, background-color 0.3s ease;
+  border-radius: 99px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--ink-light-muted);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
-.stat-card:focus-visible {
+.matter-pick-btn:hover {
+  border-color: var(--accent-gold);
+  color: var(--ivory);
+  background: rgba(197, 160, 89, 0.08);
+}
+
+.matter-pick-btn:focus-visible {
   outline: 2px solid var(--accent-gold);
   outline-offset: 3px;
 }
 
-.stat-card::before {
-  content: '';
+.matter-pick-btn[aria-pressed="true"] {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--espresso);
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(197, 160, 89, 0.25);
+}
+
+/* Procedural Track Row */
+.matter-track-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: 1.5rem 0 2rem;
+}
+
+.matter-track-line {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  left: 10%;
+  right: 10%;
+  top: 12px;
   height: 2px;
-  background: linear-gradient(90deg, var(--accent-gold) 0%, rgba(197, 160, 89, 0) 100%);
-  opacity: 0;
-  transition: opacity 0.35s ease;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 1;
 }
 
-.stat-card:hover::before {
-  opacity: 1;
+.matter-track-fill {
+  height: 100%;
+  background: var(--accent-gold);
+  width: var(--p, 0%);
+  transition: width 0.12s linear;
 }
 
-.stat-card:hover {
-  transform: translateY(-3px);
-  background: rgba(255, 255, 255, 0.045);
-  border-color: rgba(197, 160, 89, 0.35);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+.matter-node {
+  position: relative;
+  z-index: 2;
+  background: none;
+  border: 0;
+  text-align: center;
+  padding: 0 0.4rem;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  user-select: none;
 }
 
-.stat-card-top {
+.matter-node:focus-visible {
+  outline: none;
+}
+
+.matter-node:focus-visible .matter-dot {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 3px;
+}
+
+.matter-dot {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--espresso);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  transition: all 0.3s ease;
+}
+
+.matter-node.done .matter-dot {
+  border-color: var(--accent-gold);
+  background: var(--accent-gold);
+}
+
+.matter-node.cur .matter-dot {
+  box-shadow: 0 0 0 7px rgba(197, 160, 89, 0.25);
+  border-color: #FFFFFF;
+  background: var(--accent-gold);
+}
+
+.matter-node b {
+  display: block;
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--ink-light-muted);
+  transition: color 0.3s ease;
+  line-height: 1.3;
+}
+
+.matter-node.done b {
+  color: var(--ivory);
+}
+
+.matter-node small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8E877D;
+  margin-top: 4px;
+}
+
+/* Detail Card */
+.matter-detail-card {
+  margin-top: 1rem;
+  border: 1px solid rgba(230, 224, 213, 0.12);
+  border-left: 3px solid var(--accent-gold);
+  background: var(--espresso-card, #221D1A);
+  padding: 1.6rem 2.2rem;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  align-items: center;
+  min-height: 110px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.matter-detail-left {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 0.75rem;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.stat-value {
+.matter-detail-where {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.matter-detail-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 2vw, 1.6rem);
+  font-weight: 600;
+  color: var(--ivory);
+  line-height: 1.25;
+}
+
+.matter-detail-desc {
+  font-size: 0.98rem;
+  line-height: 1.68;
+  color: #D3CABD;
+  margin: 0;
+}
+
+/* Scroll Hint */
+.matter-scroll-hint {
+  margin-top: 1.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-light-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.matter-scroll-hint .hint-arrow {
+  display: inline-block;
+  animation: hintArrowBounce 1.5s infinite ease-in-out;
+}
+
+@keyframes hintArrowBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* After Facts & Compliance Section */
+.matter-after-section {
+  padding: 4.5rem 0 6.5rem;
+  border-top: 1px solid rgba(230, 224, 213, 0.08);
+  background: #151210;
+}
+
+.matter-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.8rem;
+}
+
+.matter-fact-card {
+  padding: 2rem 1.8rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(230, 224, 213, 0.08);
+  border-top: 2px solid var(--accent-gold);
+}
+
+.matter-fact-val {
+  display: block;
   font-family: var(--font-display);
-  font-size: clamp(2.2rem, 3.2vw, 2.9rem);
+  font-size: clamp(2.4rem, 3.5vw, 3.2rem);
   font-weight: 700;
   color: var(--ivory);
   line-height: 1;
+  margin-bottom: 0.6rem;
   letter-spacing: -0.02em;
 }
 
-.stat-badge {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent-gold);
-  background: rgba(197, 160, 89, 0.1);
-  padding: 0.25rem 0.6rem;
-  border: 1px solid rgba(197, 160, 89, 0.22);
-}
-
-.stat-label {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
+.matter-fact-lbl {
+  display: block;
+  font-size: 0.98rem;
   font-weight: 600;
   color: var(--ivory);
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
+  margin-bottom: 0.4rem;
 }
 
-.stat-desc {
-  font-size: 0.88rem;
-  line-height: 1.6;
+.matter-fact-sub {
+  font-size: 0.82rem;
+  line-height: 1.5;
   color: var(--ink-light-muted);
 }
 
-@media (max-width: 992px) {
-  .track-record-split-layout {
+.matter-compliance-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: 3rem;
+  padding: 1.4rem 1.8rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(230, 224, 213, 0.08);
+}
+
+.compliance-badge {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--accent-gold);
+  background: rgba(197, 160, 89, 0.12);
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  white-space: nowrap;
+}
+
+.compliance-text {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #A3978A;
+  margin: 0;
+}
+
+/* ==========================================================================
+   SECTION 4: INTERACTIVE COURT PLEADING DOCTRINE
+   Inspired by malik-interactive.html, elevated to authentic courtroom brief
+   ========================================================================== */
+.doctrine-header-block {
+  max-width: 850px;
+  margin-bottom: 3.5rem;
+}
+
+.doctrine-header-block h2 {
+  font-size: clamp(2rem, 3.4vw, 2.85rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-top: 0.8rem;
+}
+
+.doctrine-header-block .stats-intro-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--ink-light-muted);
+  margin-top: 0.8rem;
+}
+
+.pleading-interactive-grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.35fr;
+  gap: clamp(2.5rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+/* Principle Tabs on Left */
+.pleading-principles-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.pleading-pr-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.8rem 0 1.8rem 1.4rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 1.8vw, 1.55rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-light-muted);
+  position: relative;
+  cursor: pointer;
+  transition: color 0.25s ease, padding-left 0.3s ease, background-color 0.2s ease;
+}
+
+.pleading-pr-btn:first-child {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pleading-pr-btn::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 1.8rem;
+  bottom: 1.8rem;
+  width: 3.5px;
+  background: var(--accent-gold);
+  transform: scaleY(0);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pleading-pr-btn:hover {
+  color: var(--ivory);
+}
+
+.pleading-pr-btn:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: 3px;
+}
+
+.pleading-pr-btn.on {
+  color: var(--ivory);
+  padding-left: 2.2rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.pleading-pr-btn.on::before {
+  transform: scaleY(1);
+}
+
+/* Pleading Paper on Right */
+.pleading-paper {
+  background: #FAF7F2;
+  color: #26201C;
+  font-family: var(--font-serif);
+  padding: clamp(2.2rem, 4vw, 3.4rem);
+  font-size: 1.08rem;
+  line-height: 1.85;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  border: 1px solid #DCD4C7;
+  position: relative;
+  border-radius: 2px;
+}
+
+.pleading-paper-header {
+  text-align: center;
+  border-bottom: 1px solid #D0C7B8;
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pleading-paper-crest {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #7A6F62;
+  font-weight: 600;
+}
+
+.pleading-paper-caption {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1B1714;
+}
+
+.pleading-paper-suit {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: #5C5247;
+  font-weight: 600;
+}
+
+.pleading-paper-disclaimer {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #8C8072;
+  margin-top: 0.35rem;
+}
+
+.pleading-averments {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.pleading-p {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.pleading-para-num {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: #8C8072;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.pleading-mark {
+  background: linear-gradient(#F5D886, #F5D886) no-repeat 0 100%/0 100%;
+  color: inherit;
+  padding: 2px 2px;
+  border-radius: 2px;
+  transition: background-size 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.pleading-mark.on {
+  background-size: 100% 100%;
+  font-weight: 600;
+  color: #15110E;
+}
+
+.pleading-paper.has-on .pleading-mark:not(.on) {
+  opacity: 0.38;
+}
+
+.pleading-watermark {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(38, 32, 28, 0.22);
+  pointer-events: none;
+}
+
+/* Doctrine Note Card */
+.pleading-note-card {
+  margin-top: 1.8rem;
+  border-left: 3px solid var(--accent-gold);
+  padding: 1.25rem 1.6rem;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--accent-gold);
+  font-size: 0.98rem;
+  line-height: 1.62;
+  min-height: 78px;
+}
+
+.pleading-note-card strong {
+  color: var(--accent-gold);
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+.pleading-note-card span {
+  color: #D3CABD;
+}
+
+@media (max-width: 900px) {
+  .matter-track-row {
+    grid-template-columns: repeat(5, 1fr);
+  }
+  .matter-node b {
+    font-size: 0.78rem;
+  }
+  .matter-node small {
+    display: none;
+  }
+  .matter-detail-card {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1.4rem;
+  }
+  .matter-facts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pleading-interactive-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
-  .track-record-sticky-col {
-    position: static;
+}
+
+@media (max-width: 600px) {
+  .matter-facts-grid {
+    grid-template-columns: 1fr;
+  }
+  .matter-detail-card {
+    padding: 1.2rem;
+  }
+  .pleading-paper {
+    padding: 1.8rem 1.4rem;
+    font-size: 0.98rem;
   }
 }
 
