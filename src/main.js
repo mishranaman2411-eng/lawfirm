@@ -3,11 +3,109 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+/**
+ * Unified, Hardware-Accelerated Scroll UI Manager
+ * Consolidates navbar solid state, ScrollSpy navigation highlighting, and back-to-top button
+ * into a single requestAnimationFrame-throttled loop without layout thrashing.
+ */
+let cachedHeroThreshold = 0;
+let cachedBackToTopThreshold = 0;
+let cachedSections = [];
+let cachedNavLinks = [];
+let scrollTicking = false;
+
+function updateScrollMetrics() {
+  const heroContainer = document.getElementById('hero-experience');
+  cachedHeroThreshold = heroContainer ? heroContainer.offsetHeight - 80 : window.innerHeight * 2.5;
+  cachedBackToTopThreshold = window.innerHeight * 1.8;
+
+  const sectionIds = ['advocates', 'practice-areas', 'firm-statistics', 'approach', 'consultation'];
+  cachedSections = sectionIds
+    .map((id) => {
+      const el = document.getElementById(id);
+      if (!el) return null;
+      return {
+        id,
+        top: el.offsetTop,
+        height: el.offsetHeight
+      };
+    })
+    .filter(Boolean);
+
+  cachedNavLinks = Array.from(document.querySelectorAll('.site-nav__link, .mobile-nav-link'));
+}
+
+function handleUnifiedScroll() {
+  if (!scrollTicking) {
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      const scrollY = window.scrollY;
+
+      // 1. Navbar Solid State
+      const nav = document.getElementById('site-nav');
+      if (nav) {
+        if (scrollY >= cachedHeroThreshold) {
+          nav.classList.add('scrolled');
+        } else {
+          nav.classList.remove('scrolled');
+        }
+      }
+
+      // 2. Back to Top Button
+      const backBtn = document.getElementById('back-to-top');
+      if (backBtn) {
+        if (scrollY > cachedBackToTopThreshold) {
+          backBtn.classList.add('visible');
+        } else {
+          backBtn.classList.remove('visible');
+        }
+      }
+
+      // 3. ScrollSpy Active Link
+      const scrollPos = scrollY + window.innerHeight * 0.35;
+      let currentId = '';
+      for (let i = 0; i < cachedSections.length; i++) {
+        const sec = cachedSections[i];
+        if (scrollPos >= sec.top && scrollPos < sec.top + sec.height) {
+          currentId = sec.id;
+          break;
+        }
+      }
+
+      for (let i = 0; i < cachedNavLinks.length; i++) {
+        const link = cachedNavLinks[i];
+        const href = link.getAttribute('href');
+        if (currentId && href === '#' + currentId) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      }
+
+      scrollTicking = false;
+    });
+  }
+}
+
+function initScrollUIManager() {
+  updateScrollMetrics();
+  window.addEventListener('scroll', handleUnifiedScroll, { passive: true });
+  window.addEventListener('resize', updateScrollMetrics, { passive: true });
+  ScrollTrigger.addEventListener('refresh', updateScrollMetrics);
+
+  const backBtn = document.getElementById('back-to-top');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  handleUnifiedScroll();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  initNavbarScrollState();
+  initScrollUIManager();
   initMobileNav();
-  initScrollSpy();
-  initBackToTop();
   initHeroScrub();
   initDrawers();
   initConsultationAppointmentForm();
@@ -83,6 +181,14 @@ function initHeroScrub() {
   // Canvas Sizing with Aspect Ratio & Device Pixel Ratio
   let canvasWidth = 0;
   let canvasHeight = 0;
+  let cachedMetrics = null;
+  let cachedDesktopBgGrad = null;
+  let cachedSkyGrad = null;
+  let cachedCloudGrad = null;
+  let cachedAmbGrad = null;
+  let cachedTopFeatherGrad = null;
+  let cachedBotFeatherGrad = null;
+  let lastSvgFrameIndex = -1;
 
   /**
    * Calculate precise canvas frame layout and architectural building center
@@ -132,8 +238,6 @@ function initHeroScrub() {
     }
 
     // Exact horizontal and vertical center of the courthouse architecture on screen
-    // Horizontal center: roof beam 407..1189, center is 798 (ratio = 798/1600 = 0.49875)
-    // Vertical center: facade 369..660, upper center is 465 (ratio = 465/900 = 0.5167)
     const buildingCenterX = drawX + (798 / 1600) * drawW;
     const buildingCenterY = drawY + (465 / 900) * drawH;
 
@@ -146,7 +250,7 @@ function initHeroScrub() {
     const h = canvasHeight;
     koSvg.setAttribute('viewBox', `0 0 ${w} ${h}`);
 
-    const { buildingCenterX, buildingCenterY } = getFrameDrawMetrics();
+    const { buildingCenterX, buildingCenterY } = cachedMetrics || getFrameDrawMetrics();
     const isMobile = w < 860;
 
     if (!isMobile) {
@@ -211,7 +315,8 @@ function initHeroScrub() {
 
   function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // Cap DPR to 1.25 on high-DPI screens to prevent massive fillrate overhead
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     canvasWidth = rect.width;
     canvasHeight = rect.height;
 
@@ -219,11 +324,71 @@ function initHeroScrub() {
     canvas.height = Math.round(canvasHeight * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+    cachedMetrics = getFrameDrawMetrics();
+    const { drawW, drawH, drawX, drawY } = cachedMetrics;
+    const w = canvasWidth;
+    const h = canvasHeight;
+
+    // Pre-create and cache desktop gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, '#C5D6D9');
+    grad.addColorStop(0.35, '#CCD7DA');
+    grad.addColorStop(0.65, '#C8CDC6');
+    grad.addColorStop(1, '#C4C8C0');
+    cachedDesktopBgGrad = grad;
+
+    if (drawY > 0) {
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, drawY + 65);
+      skyGrad.addColorStop(0, '#C5D6D9');
+      skyGrad.addColorStop(0.45, '#C5D6D9');
+      skyGrad.addColorStop(1, 'rgba(197, 214, 217, 0)');
+      cachedSkyGrad = skyGrad;
+
+      const cloudGrad = ctx.createLinearGradient(0, drawY + drawH - 65, 0, h);
+      cloudGrad.addColorStop(0, 'rgba(196, 200, 192, 0)');
+      cloudGrad.addColorStop(0.45, '#C4C8C0');
+      cloudGrad.addColorStop(1, '#C4C8C0');
+      cachedCloudGrad = cloudGrad;
+    } else {
+      cachedSkyGrad = null;
+      cachedCloudGrad = null;
+    }
+
+    const aGrad = ctx.createLinearGradient(0, 0, 0, h);
+    aGrad.addColorStop(0, 'rgba(197, 214, 217, 0.40)');
+    aGrad.addColorStop(0.26, 'rgba(24, 21, 19, 0.04)');
+    aGrad.addColorStop(0.74, 'rgba(24, 21, 19, 0.04)');
+    aGrad.addColorStop(1, 'rgba(196, 200, 192, 0.48)');
+    cachedAmbGrad = aGrad;
+
+    const fH = Math.ceil(drawH);
+    const topFeather = fH * 0.20;
+    const tGrad = ctx.createLinearGradient(0, 0, 0, topFeather);
+    tGrad.addColorStop(0, 'rgba(0,0,0,1)');
+    tGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
+    tGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    cachedTopFeatherGrad = tGrad;
+
+    const botFeather = fH * 0.22;
+    const bGrad = ctx.createLinearGradient(0, fH - botFeather, 0, fH);
+    bGrad.addColorStop(0, 'rgba(0,0,0,0)');
+    bGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
+    bGrad.addColorStop(1, 'rgba(0,0,0,1)');
+    cachedBotFeatherGrad = bGrad;
+
+    // Set static SVG bounds on resize instead of every scroll frame
+    if (koLiveImg) {
+      koLiveImg.setAttribute('x', `${drawX}`);
+      koLiveImg.setAttribute('y', `${drawY}`);
+      koLiveImg.setAttribute('width', `${drawW}`);
+      koLiveImg.setAttribute('height', `${drawH}`);
+    }
+
     updateKnockoutTypography();
 
-    if (currentRenderedIndex >= 0) {
-      drawFrame(currentRenderedIndex);
-    }
+    const frameToRedraw = currentRenderedIndex >= 0 ? currentRenderedIndex : 0;
+    currentRenderedIndex = -1;
+    drawFrame(frameToRedraw);
   }
 
   window.addEventListener('resize', resizeCanvas);
@@ -234,8 +399,29 @@ function initHeroScrub() {
   let featherCanvas = null;
   let featherCtx = null;
 
-  // High-performance Draw function that preserves 16:9 aspect ratio without cropping
+  // Fast lookup for loaded frame with capped search radius
+  function findNearestLoadedFrame(index) {
+    if (frames[index] && frames[index].complete && frames[index].naturalWidth > 0) {
+      return frames[index];
+    }
+    const maxSearch = Math.min(25, TOTAL_FRAMES);
+    for (let offset = 1; offset < maxSearch; offset++) {
+      const prev = index - offset;
+      if (prev >= 0 && frames[prev] && frames[prev].complete && frames[prev].naturalWidth > 0) {
+        return frames[prev];
+      }
+      const next = index + offset;
+      if (next < TOTAL_FRAMES && frames[next] && frames[next].complete && frames[next].naturalWidth > 0) {
+        return frames[next];
+      }
+    }
+    return frames[0] || null;
+  }
+
+  // High-performance Draw function with deduplication and cached gradients
   function drawFrame(frameIndex) {
+    if (frameIndex === currentRenderedIndex) return;
+
     const targetImg = findNearestLoadedFrame(frameIndex);
     if (!targetImg || !targetImg.complete || targetImg.naturalWidth === 0) return;
 
@@ -245,35 +431,22 @@ function initHeroScrub() {
     const h = canvasHeight;
     const aspect = w / h;
     const isMobile = w < 900 || aspect < 1.25;
-    const { drawW, drawH, drawX, drawY } = getFrameDrawMetrics();
+    const { drawW, drawH, drawX, drawY } = cachedMetrics || getFrameDrawMetrics();
 
     if (!isMobile) {
-      // DESKTOP: Direct crisp rendering with matched frame edge gradients
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#C5D6D9');
-      grad.addColorStop(0.35, '#CCD7DA');
-      grad.addColorStop(0.65, '#C8CDC6');
-      grad.addColorStop(1, '#C4C8C0');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
+      // DESKTOP: Direct crisp rendering with cached gradients
+      if (cachedDesktopBgGrad) {
+        ctx.fillStyle = cachedDesktopBgGrad;
+        ctx.fillRect(0, 0, w, h);
+      }
 
-      // Draw the frame
       ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
 
-      // Feather top and bottom edges if letterboxed
-      if (drawY > 0) {
-        const skyGrad = ctx.createLinearGradient(0, 0, 0, drawY + 65);
-        skyGrad.addColorStop(0, '#C5D6D9');
-        skyGrad.addColorStop(0.45, '#C5D6D9');
-        skyGrad.addColorStop(1, 'rgba(197, 214, 217, 0)');
-        ctx.fillStyle = skyGrad;
+      if (drawY > 0 && cachedSkyGrad && cachedCloudGrad) {
+        ctx.fillStyle = cachedSkyGrad;
         ctx.fillRect(0, 0, w, drawY + 65);
 
-        const cloudGrad = ctx.createLinearGradient(0, drawY + drawH - 65, 0, h);
-        cloudGrad.addColorStop(0, 'rgba(196, 200, 192, 0)');
-        cloudGrad.addColorStop(0.45, '#C4C8C0');
-        cloudGrad.addColorStop(1, '#C4C8C0');
-        ctx.fillStyle = cloudGrad;
+        ctx.fillStyle = cachedCloudGrad;
         ctx.fillRect(0, drawY + drawH - 65, w, h - (drawY + drawH - 65));
       }
     } else {
@@ -281,8 +454,6 @@ function initHeroScrub() {
       const srcW = 1600;
       const srcH = 900;
 
-      // 1. Live video atmospheric cover layer across 100% of the mobile viewport
-      // Downscaled offscreen buffer enables GPU-accelerated silky smooth bilinear upscaling at 60fps
       const ambW = 160;
       const ambH = Math.max(280, Math.round(160 * (h / w)));
       if (!ambientCanvas) {
@@ -297,24 +468,17 @@ function initHeroScrub() {
       const coverScale = Math.max(ambW / srcW, ambH / srcH);
       const cW = srcW * coverScale;
       const cH = srcH * coverScale;
-      const cX = (ambW - cW) / 2;
-      const cY = (ambH - cH) / 2;
-      ambientCtx.drawImage(targetImg, cX, cY, cW, cH);
+      ambientCtx.drawImage(targetImg, (ambW - cW) / 2, (ambH - cH) / 2, cW, cH);
 
       ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
+      ctx.imageSmoothingQuality = 'medium';
       ctx.drawImage(ambientCanvas, 0, 0, w, h);
 
-      // Subtle atmospheric gradient overlay for text readability & editorial warmth
-      const ambGrad = ctx.createLinearGradient(0, 0, 0, h);
-      ambGrad.addColorStop(0, 'rgba(197, 214, 217, 0.40)');
-      ambGrad.addColorStop(0.26, 'rgba(24, 21, 19, 0.04)');
-      ambGrad.addColorStop(0.74, 'rgba(24, 21, 19, 0.04)');
-      ambGrad.addColorStop(1, 'rgba(196, 200, 192, 0.48)');
-      ctx.fillStyle = ambGrad;
-      ctx.fillRect(0, 0, w, h);
+      if (cachedAmbGrad) {
+        ctx.fillStyle = cachedAmbGrad;
+        ctx.fillRect(0, 0, w, h);
+      }
 
-      // 2. Focused uncropped architectural courthouse layer
       const fW = Math.ceil(drawW);
       const fH = Math.ceil(drawH);
       if (!featherCanvas) {
@@ -329,53 +493,18 @@ function initHeroScrub() {
       featherCtx.globalCompositeOperation = 'source-over';
       featherCtx.drawImage(targetImg, 0, 0, fW, fH);
 
-      // Feather top sky and bottom mist into the live video atmosphere
       featherCtx.globalCompositeOperation = 'destination-out';
-      const topFeather = fH * 0.20;
-      const tGrad = featherCtx.createLinearGradient(0, 0, 0, topFeather);
-      tGrad.addColorStop(0, 'rgba(0,0,0,1)');
-      tGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
-      tGrad.addColorStop(1, 'rgba(0,0,0,0)');
-      featherCtx.fillStyle = tGrad;
-      featherCtx.fillRect(0, 0, fW, topFeather);
-
-      const botFeather = fH * 0.22;
-      const bGrad = featherCtx.createLinearGradient(0, fH - botFeather, 0, fH);
-      bGrad.addColorStop(0, 'rgba(0,0,0,0)');
-      bGrad.addColorStop(0.65, 'rgba(0,0,0,0.4)');
-      bGrad.addColorStop(1, 'rgba(0,0,0,1)');
-      featherCtx.fillStyle = bGrad;
-      featherCtx.fillRect(0, fH - botFeather, fW, botFeather);
+      if (cachedTopFeatherGrad) {
+        featherCtx.fillStyle = cachedTopFeatherGrad;
+        featherCtx.fillRect(0, 0, fW, fH * 0.20);
+      }
+      if (cachedBotFeatherGrad) {
+        featherCtx.fillStyle = cachedBotFeatherGrad;
+        featherCtx.fillRect(0, fH - fH * 0.22, fW, fH * 0.22);
+      }
 
       ctx.drawImage(featherCanvas, drawX, drawY);
     }
-
-    // Sync live frame rendering inside the knockout typography
-    if (koLiveImg) {
-      koLiveImg.setAttribute('href', getFrameUrl(frameIndex));
-      koLiveImg.setAttribute('x', `${drawX}`);
-      koLiveImg.setAttribute('y', `${drawY}`);
-      koLiveImg.setAttribute('width', `${drawW}`);
-      koLiveImg.setAttribute('height', `${drawH}`);
-    }
-  }
-
-  // Graceful fallback for rapid scrubs: finds closest loaded neighbor frame
-  function findNearestLoadedFrame(index) {
-    if (frames[index] && frames[index].complete) {
-      return frames[index];
-    }
-    for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
-      const prev = index - offset;
-      if (prev >= 0 && frames[prev] && frames[prev].complete) {
-        return frames[prev];
-      }
-      const next = index + offset;
-      if (next < TOTAL_FRAMES && frames[next] && frames[next].complete) {
-        return frames[next];
-      }
-    }
-    return frames[0];
   }
 
   // Progressive Preloading Strategy
@@ -438,20 +567,22 @@ function initHeroScrub() {
         if (!frames[target]) {
           loadSingleFrame(target, () => {
             batchLoaded++;
-            if (loaderEl) {
-              const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
-              loaderEl.textContent = `CHAMBERS VIEW · ${pct}%`;
-            }
             if (batchLoaded === countToLoad) {
+              if (loaderEl) {
+                const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
+                if (pct % 10 === 0 || pct >= 98) {
+                  loaderEl.textContent = `CHAMBERS VIEW · ${pct}%`;
+                }
+              }
               nextIndex += batchSize;
-              setTimeout(loadNextBatch, 16);
+              setTimeout(loadNextBatch, 32);
             }
           });
         } else {
           batchLoaded++;
           if (batchLoaded === countToLoad) {
             nextIndex += batchSize;
-            setTimeout(loadNextBatch, 16);
+            setTimeout(loadNextBatch, 32);
           }
         }
       }
@@ -466,12 +597,18 @@ function initHeroScrub() {
       trigger: '.hero-scroll-container',
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 0.6, // Smooth cinematic scrub with silky inertia
+      scrub: 0.1, // Near-instant 100ms scrub response — eliminates 600ms trailing lag
       invalidateOnRefresh: true,
       onUpdate: (self) => {
         const p = self.progress;
         const targetFrame = Math.min(TOTAL_FRAMES - 1, Math.floor(p * TOTAL_FRAMES));
         drawFrame(targetFrame);
+
+        // Only update knockout SVG href when knockout is actually visible on screen
+        if (koLiveImg && p >= 0.18 && p <= 0.98 && targetFrame !== lastSvgFrameIndex) {
+          lastSvgFrameIndex = targetFrame;
+          koLiveImg.setAttribute('href', getFrameUrl(targetFrame));
+        }
 
         // Fade scroll indicator as user scrolls
         if (scrollIndicatorEl) {

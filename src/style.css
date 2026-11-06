@@ -493,6 +493,7 @@ button {
    HERO SCROLL STAGE (CANVAS SCRUB + KNOCKOUT OVERLAY)
    ========================================================================== */
 .hero-scroll-container {
+  contain: paint;
   position: relative;
   width: 100%;
   height: 320vh;
@@ -512,6 +513,9 @@ button {
   justify-content: center;
   align-items: center;
   background: linear-gradient(180deg, #C5D6D9 0%, #CCD7DA 35%, #C8CDC6 65%, #C4C8C0 100%);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .hero-canvas-wrapper {
@@ -524,12 +528,14 @@ button {
   align-items: center;
   justify-content: center;
   z-index: 1;
+  transform: translateZ(0);
 }
 
 #courthouse-canvas {
   width: 100%;
   height: 100%;
   display: block;
+  transform: translateZ(0);
 }
 
 /* Architectural HUD */
@@ -708,7 +714,7 @@ button {
   fill: none;
   stroke: rgba(251, 248, 243, 0.95);
   stroke-width: 1.5px;
-  filter: drop-shadow(0 4px 20px rgba(24, 21, 19, 0.55));
+  filter: drop-shadow(0 2px 4px rgba(24, 21, 19, 0.45));
 }
 
 .ko-sub-label {
@@ -717,7 +723,7 @@ button {
   letter-spacing: 0.26em;
   text-transform: uppercase;
   fill: #FBF8F3;
-  filter: drop-shadow(0 2px 14px rgba(24, 21, 19, 0.65));
+  filter: drop-shadow(0 1px 3px rgba(24, 21, 19, 0.5));
 }
 
 .hero-knockout-meta {
