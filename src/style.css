@@ -3758,3 +3758,13 @@ button {
     transform: none !important;
   }
 }
+@media (max-width: 860px) {
+  #ko-live-image {
+    display: none !important;
+  }
+  .ko-mobile-text.ko-contour {
+    fill: rgba(251, 248, 243, 0.18);
+    stroke: rgba(251, 248, 243, 0.95);
+    stroke-width: 1.5px;
+  }
+}

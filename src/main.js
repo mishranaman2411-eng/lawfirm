@@ -320,8 +320,9 @@ function initHeroScrub() {
 
   function resizeCanvas() {
     const rect = canvas.getBoundingClientRect();
-    // Cap DPR to 1.25 on high-DPI screens to prevent massive fillrate overhead
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    const isMobile = window.innerWidth < 860;
+    // On mobile screens, use 1.0 DPR to eliminate fillrate lag on high-DPI retina devices
+    const dpr = isMobile ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.25);
     canvasWidth = rect.width;
     canvasHeight = rect.height;
 
@@ -423,7 +424,7 @@ function initHeroScrub() {
     return frames[0] || null;
   }
 
-  // High-performance Draw function with deduplication and cached gradients
+  // High-performance Draw function with direct GPU blitting (zero offscreen canvas overhead)
   function drawFrame(frameIndex) {
     if (frameIndex === currentRenderedIndex) return;
 
@@ -434,81 +435,24 @@ function initHeroScrub() {
 
     const w = canvasWidth;
     const h = canvasHeight;
-    const aspect = w / h;
-    const isMobile = w < 900 || aspect < 1.25;
     const { drawW, drawH, drawX, drawY } = cachedMetrics || getFrameDrawMetrics();
 
-    if (!isMobile) {
-      // DESKTOP: Direct crisp rendering with cached gradients
-      if (cachedDesktopBgGrad) {
-        ctx.fillStyle = cachedDesktopBgGrad;
-        ctx.fillRect(0, 0, w, h);
-      }
+    // 1. Background sky-to-cloud gradient
+    if (cachedDesktopBgGrad) {
+      ctx.fillStyle = cachedDesktopBgGrad;
+      ctx.fillRect(0, 0, w, h);
+    }
 
-      ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
+    // 2. Direct hardware image blit
+    ctx.drawImage(targetImg, drawX, drawY, drawW, drawH);
 
-      if (drawY > 0 && cachedSkyGrad && cachedCloudGrad) {
-        ctx.fillStyle = cachedSkyGrad;
-        ctx.fillRect(0, 0, w, drawY + 65);
+    // 3. Cached seamless feathering for top sky and bottom cloud edges
+    if (drawY > 0 && cachedSkyGrad && cachedCloudGrad) {
+      ctx.fillStyle = cachedSkyGrad;
+      ctx.fillRect(0, 0, w, drawY + 45);
 
-        ctx.fillStyle = cachedCloudGrad;
-        ctx.fillRect(0, drawY + drawH - 65, w, h - (drawY + drawH - 65));
-      }
-    } else {
-      // MOBILE: Seamless edge-to-edge full-screen video atmosphere with 100% uncropped courthouse
-      const srcW = 1600;
-      const srcH = 900;
-
-      const ambW = 160;
-      const ambH = Math.max(280, Math.round(160 * (h / w)));
-      if (!ambientCanvas) {
-        ambientCanvas = document.createElement('canvas');
-        ambientCtx = ambientCanvas.getContext('2d');
-      }
-      if (ambientCanvas.width !== ambW || ambientCanvas.height !== ambH) {
-        ambientCanvas.width = ambW;
-        ambientCanvas.height = ambH;
-      }
-
-      const coverScale = Math.max(ambW / srcW, ambH / srcH);
-      const cW = srcW * coverScale;
-      const cH = srcH * coverScale;
-      ambientCtx.drawImage(targetImg, (ambW - cW) / 2, (ambH - cH) / 2, cW, cH);
-
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'medium';
-      ctx.drawImage(ambientCanvas, 0, 0, w, h);
-
-      if (cachedAmbGrad) {
-        ctx.fillStyle = cachedAmbGrad;
-        ctx.fillRect(0, 0, w, h);
-      }
-
-      const fW = Math.ceil(drawW);
-      const fH = Math.ceil(drawH);
-      if (!featherCanvas) {
-        featherCanvas = document.createElement('canvas');
-        featherCtx = featherCanvas.getContext('2d');
-      }
-      if (featherCanvas.width !== fW || featherCanvas.height !== fH) {
-        featherCanvas.width = fW;
-        featherCanvas.height = fH;
-      }
-
-      featherCtx.globalCompositeOperation = 'source-over';
-      featherCtx.drawImage(targetImg, 0, 0, fW, fH);
-
-      featherCtx.globalCompositeOperation = 'destination-out';
-      if (cachedTopFeatherGrad) {
-        featherCtx.fillStyle = cachedTopFeatherGrad;
-        featherCtx.fillRect(0, 0, fW, fH * 0.20);
-      }
-      if (cachedBotFeatherGrad) {
-        featherCtx.fillStyle = cachedBotFeatherGrad;
-        featherCtx.fillRect(0, fH - fH * 0.22, fW, fH * 0.22);
-      }
-
-      ctx.drawImage(featherCanvas, drawX, drawY);
+      ctx.fillStyle = cachedCloudGrad;
+      ctx.fillRect(0, drawY + drawH - 45, w, h - (drawY + drawH - 45));
     }
   }
 
@@ -753,8 +697,9 @@ function initHeroScrub() {
         const targetFrame = Math.min(TOTAL_FRAMES - 1, Math.floor(p * TOTAL_FRAMES));
         drawFrame(targetFrame);
 
-        // Only update knockout SVG href when knockout is actually visible on screen
-        if (koLiveImg && p >= 0.18 && p <= 0.98 && targetFrame !== lastSvgFrameIndex) {
+        const isMobileDevice = window.innerWidth < 860;
+        // Only update knockout SVG href on desktop where clip-path is active
+        if (!isMobileDevice && koLiveImg && p >= 0.18 && p <= 0.98 && targetFrame !== lastSvgFrameIndex) {
           lastSvgFrameIndex = targetFrame;
           koLiveImg.setAttribute('href', getFrameUrl(targetFrame));
         }
