@@ -52,7 +52,49 @@
   }
   </script>
 </head>
-<body>
+<body class="is-loading">
+
+  <!-- ========================================================================
+       FULL-SCREEN CHAMBERS PRELOADER
+       ======================================================================== -->
+  <div class="site-preloader" id="site-preloader" aria-live="polite" aria-busy="true">
+    <div class="preloader-curtain"></div>
+    <div class="preloader-inner">
+      <header class="preloader-header">
+        <span class="preloader-brand">MALIK &amp; ASSOCIATES</span>
+        <span class="preloader-brand-sub">APPELLATE &amp; COMMERCIAL CHAMBERS</span>
+      </header>
+
+      <div class="preloader-center">
+        <!-- Minimal Circular Progress Indicator -->
+        <div class="preloader-dial" aria-hidden="true">
+          <svg class="preloader-dial-svg" viewBox="0 0 72 72">
+            <circle class="preloader-dial-track" cx="36" cy="36" r="30" />
+            <circle class="preloader-dial-indicator" id="preloader-circle-bar" cx="36" cy="36" r="30" />
+          </svg>
+          <div class="preloader-dial-core">
+            <span class="preloader-dial-dot"></span>
+          </div>
+        </div>
+
+        <!-- Large Elegant Percentage Display -->
+        <div class="preloader-counter" aria-label="Loading Progress">
+          <span class="preloader-number" id="preloader-percent">0</span>
+          <span class="preloader-unit">%</span>
+        </div>
+
+        <!-- Understated Status Ticker -->
+        <div class="preloader-status" id="preloader-status">
+          INITIALIZING CHAMBERS ARCHIVE
+        </div>
+      </div>
+
+      <footer class="preloader-footer">
+        <span class="preloader-meta">SUPREME COURT OF INDIA · DELHI HIGH COURT · NCLT · HARERA</span>
+        <span class="preloader-jurisdiction">EST. NEW DELHI &amp; GURUGRAM</span>
+      </footer>
+    </div>
+  </div>
 
   <!-- ========================================================================
        PREMIUM ARCHITECTURAL NAVIGATION
@@ -180,11 +222,6 @@
         <div class="hero-knockout-meta">
           <div class="hero-knockout-sub">Supreme Court of India · High Court of Delhi · Gurugram District Courts · NCLT</div>
         </div>
-      </div>
-
-      <!-- Progressive Buffer Status Pill -->
-      <div class="hero-loader" id="hero-loader-status">
-        <span>PREPARING CHAMBERS VIEW</span>
       </div>
 
     </div>

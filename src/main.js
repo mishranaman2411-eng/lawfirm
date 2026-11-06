@@ -159,7 +159,10 @@ function initHeroScrub() {
   let currentRenderedIndex = -1;
 
   // DOM Elements for HUD / Hero Opening / Knockout Stage
-  const loaderEl = document.getElementById('hero-loader-status');
+  const preloaderEl = document.getElementById('site-preloader');
+  const preloaderBar = document.getElementById('preloader-circle-bar');
+  const preloaderPercent = document.getElementById('preloader-percent');
+  const preloaderStatus = document.getElementById('preloader-status');
   const heroOpeningEl = document.getElementById('hero-opening-content');
   const koStageEl = document.getElementById('hero-knockout-stage');
   const koSvg = document.getElementById('hero-knockout-svg');
@@ -507,9 +510,42 @@ function initHeroScrub() {
     }
   }
 
-  // Progressive Preloading Strategy
-  const tier1Indices = [0, 20, 50, 90, 120, 150, 189];
-  let tier1Loaded = 0;
+  // Progressive Preloading & Full-Screen Chambers Preloader Setup
+  const CIRCLE_CIRCUMFERENCE = 188.5; // 2 * Math.PI * 30
+  const criticalFrameIndices = [0, 1, 2, 3, 4, 5, 20, 50, 90, 120, 150, 189];
+  const advocatePortraits = [
+    '/assets/advocates/sapna-malik.jpg',
+    '/assets/advocates/priyanka-priyadarshini.jpg',
+    '/assets/advocates/manjunatha-ht.jpg',
+    '/assets/advocates/sheetal-sharma.jpg'
+  ];
+
+  const totalCriticalUnits = criticalFrameIndices.length + advocatePortraits.length + 1; // +1 for fonts
+  let loadedCriticalUnits = 0;
+  let preloaderCompleted = false;
+
+  function onCriticalUnitLoaded() {
+    loadedCriticalUnits++;
+  }
+
+  // Track fonts
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      onCriticalUnitLoaded();
+    }).catch(() => {
+      onCriticalUnitLoaded();
+    });
+  } else {
+    onCriticalUnitLoaded();
+  }
+
+  // Track advocate portraits
+  advocatePortraits.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => onCriticalUnitLoaded();
+    img.onerror = () => onCriticalUnitLoaded();
+  });
 
   function loadSingleFrame(index, onComplete) {
     if (frames[index]) {
@@ -532,32 +568,149 @@ function initHeroScrub() {
     };
   }
 
-  // Start Tier 1
-  tier1Indices.forEach((idx) => {
+  // Load critical frames
+  criticalFrameIndices.forEach((idx) => {
     loadSingleFrame(idx, () => {
-      tier1Loaded++;
-      if (tier1Loaded === 1) {
-        resizeCanvas();
-        drawFrame(0);
-      }
-      if (tier1Loaded === tier1Indices.length) {
-        streamRemainingFrames();
-      }
+      onCriticalUnitLoaded();
     });
   });
 
-  // Tier 2: Stream all other frames in chunks
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const startTime = performance.now();
+  const minDuration = prefersReduced ? 250 : 1200; // Controlled luxury minimum duration
+  const safetyTimeout = 5000; // Safety fallback prevents indefinite stall
+
+  let displayProgress = 0;
+  let rafId = null;
+
+  function updatePreloaderStatusText(pct) {
+    if (!preloaderStatus) return;
+    let label = 'INITIALIZING CHAMBERS ARCHIVE';
+    if (pct >= 100) {
+      label = 'CHAMBERS PREPARED · ADMITTING';
+    } else if (pct >= 85) {
+      label = 'PREPARING BENCH ADMISSION';
+    } else if (pct >= 55) {
+      label = 'CALIBRATING APPELLATE ARCHIVE';
+    } else if (pct >= 25) {
+      label = 'LOADING JURISDICTION ASSETS';
+    }
+    if (preloaderStatus.textContent !== label) {
+      preloaderStatus.textContent = label;
+    }
+  }
+
+  function finishPreloader() {
+    if (preloaderCompleted) return;
+    preloaderCompleted = true;
+    cancelAnimationFrame(rafId);
+
+    // Pre-draw pristine frame 0 while preloader curtain is still opaque
+    resizeCanvas();
+    drawFrame(0);
+
+    // Lock to 100%
+    if (preloaderPercent) preloaderPercent.textContent = '100';
+    if (preloaderBar) preloaderBar.style.strokeDashoffset = '0';
+    updatePreloaderStatusText(100);
+
+    // Brief 300ms hold at 100% for prestige perception
+    const holdDuration = prefersReduced ? 50 : 300;
+
+    setTimeout(() => {
+      if (!preloaderEl) {
+        document.body.classList.remove('is-loading');
+        document.body.style.overflow = '';
+        streamRemainingFrames();
+        return;
+      }
+
+      if (prefersReduced) {
+        preloaderEl.style.display = 'none';
+        preloaderEl.setAttribute('aria-busy', 'false');
+        document.body.classList.remove('is-loading');
+        document.body.style.overflow = '';
+        streamRemainingFrames();
+        ScrollTrigger.refresh();
+        return;
+      }
+
+      const exitTl = gsap.timeline({
+        onComplete: () => {
+          preloaderEl.style.display = 'none';
+          preloaderEl.setAttribute('aria-busy', 'false');
+          document.body.classList.remove('is-loading');
+          document.body.style.overflow = '';
+          streamRemainingFrames();
+          ScrollTrigger.refresh();
+        }
+      });
+
+      exitTl.to('.preloader-inner', {
+        y: -24,
+        opacity: 0,
+        duration: 0.5,
+        ease: 'power2.inOut'
+      })
+      .to(preloaderEl, {
+        opacity: 0,
+        duration: 0.65,
+        ease: 'power2.inOut'
+      }, '-=0.2');
+    }, holdDuration);
+  }
+
+  function preloaderLoop(currentTime) {
+    if (preloaderCompleted) return;
+    const elapsed = currentTime - startTime;
+    const isTimeout = elapsed >= safetyTimeout;
+
+    // Actual progress from real asset tracking
+    const realProgress = isTimeout ? 1.0 : Math.min(1.0, loadedCriticalUnits / totalCriticalUnits);
+    const timeProgress = Math.min(1.0, elapsed / minDuration);
+
+    // Target progress slows near 90% until real assets finish
+    let targetPct;
+    if (realProgress >= 1.0) {
+      targetPct = timeProgress >= 1.0 ? 100 : timeProgress * 100;
+    } else {
+      // Hold back at ~88-92% while waiting for assets
+      targetPct = Math.min(realProgress * 100, 88 + timeProgress * 6);
+    }
+
+    // Smoothly step towards target
+    const diff = targetPct - displayProgress;
+    const step = Math.max(diff * 0.12, 0.45);
+    displayProgress += step;
+
+    if (displayProgress >= 99.5 && realProgress >= 1.0 && (timeProgress >= 1.0 || isTimeout)) {
+      displayProgress = 100;
+      finishPreloader();
+      return;
+    }
+
+    const currentRounded = Math.min(99, Math.floor(displayProgress));
+    if (preloaderPercent) {
+      preloaderPercent.textContent = String(currentRounded);
+    }
+    if (preloaderBar) {
+      const offset = CIRCLE_CIRCUMFERENCE * (1 - displayProgress / 100);
+      preloaderBar.style.strokeDashoffset = String(Math.max(0, offset.toFixed(2)));
+    }
+    updatePreloaderStatusText(currentRounded);
+
+    rafId = requestAnimationFrame(preloaderLoop);
+  }
+
+  rafId = requestAnimationFrame(preloaderLoop);
+
+  // Tier 2: Stream all other frames quietly in background batches
   function streamRemainingFrames() {
     let nextIndex = 0;
     const batchSize = 6;
 
     function loadNextBatch() {
-      if (nextIndex >= TOTAL_FRAMES) {
-        if (loaderEl) {
-          loaderEl.classList.add('hidden');
-        }
-        return;
-      }
+      if (nextIndex >= TOTAL_FRAMES) return;
 
       let batchLoaded = 0;
       const countToLoad = Math.min(batchSize, TOTAL_FRAMES - nextIndex);
@@ -568,12 +721,6 @@ function initHeroScrub() {
           loadSingleFrame(target, () => {
             batchLoaded++;
             if (batchLoaded === countToLoad) {
-              if (loaderEl) {
-                const pct = Math.round((loadedCount / TOTAL_FRAMES) * 100);
-                if (pct % 10 === 0 || pct >= 98) {
-                  loaderEl.textContent = `CHAMBERS VIEW · ${pct}%`;
-                }
-              }
               nextIndex += batchSize;
               setTimeout(loadNextBatch, 32);
             }
