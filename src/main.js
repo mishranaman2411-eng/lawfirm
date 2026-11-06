@@ -960,60 +960,178 @@ function initBackToTop() {
  */
 function initConsultationAppointmentForm() {
   const form = document.getElementById('consultation-intake-form');
+  const container = document.getElementById('consultation-mcq-container');
+  if (!form || !container) return;
+
+  const stepIndicatorNum = document.getElementById('mcq-step-num');
+  const stepIndicatorTitle = document.getElementById('mcq-step-title');
+  const progressBar = document.getElementById('mcq-progress-bar');
+  const progressHeader = container.querySelector('.mcq-progress-header');
   const statusMsg = document.getElementById('intake-status-msg');
-  if (!form) return;
+  const summaryBox = document.getElementById('mcq-confirmation-summary');
+  const resetBtn = document.getElementById('mcq-reset-btn');
 
-  const phoneInput = document.getElementById('client-phone');
+  const steps = container.querySelectorAll('.mcq-step');
+  const stepTitles = {
+    1: 'Matter domain',
+    2: 'Matter stage',
+    3: 'Consultation venue',
+    4: 'Contact & brief',
+    5: 'Confirmation'
+  };
 
+  let currentStep = 1;
+
+  function showStep(stepNum) {
+    currentStep = stepNum;
+    steps.forEach((step) => {
+      const stepIndex = parseInt(step.getAttribute('data-step'), 10);
+      if (stepIndex === stepNum) {
+        step.style.display = 'block';
+        step.classList.add('is-active');
+      } else {
+        step.style.display = 'none';
+        step.classList.remove('is-active');
+      }
+    });
+
+    if (stepNum <= 4) {
+      if (progressHeader) progressHeader.style.display = 'block';
+      if (stepIndicatorNum) stepIndicatorNum.textContent = String(stepNum);
+      if (stepIndicatorTitle) stepIndicatorTitle.textContent = stepTitles[stepNum] || '';
+      if (progressBar) progressBar.style.width = `${stepNum * 25}%`;
+    } else {
+      if (progressHeader) progressHeader.style.display = 'none';
+    }
+
+    if (window.ScrollTrigger) {
+      window.ScrollTrigger.refresh();
+    }
+  }
+
+  // Handle Next buttons
+  container.querySelectorAll('.btn-mcq-next').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nextStep = parseInt(btn.getAttribute('data-next'), 10);
+      if (nextStep) {
+        showStep(nextStep);
+      }
+    });
+  });
+
+  // Handle Back buttons
+  container.querySelectorAll('.btn-mcq-back').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const prevStep = parseInt(btn.getAttribute('data-prev'), 10);
+      if (prevStep) {
+        showStep(prevStep);
+      }
+    });
+  });
+
+  // Form submission on Step 4
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    // Client-side phone verification
+    const nameInput = document.getElementById('client-name');
+    const phoneInput = document.getElementById('client-phone');
+    const emailInput = document.getElementById('client-email');
+
+    if (!nameInput || !nameInput.value.trim()) {
+      if (nameInput) nameInput.focus();
+      if (statusMsg) {
+        statusMsg.className = 'form-feedback-pill error';
+        statusMsg.innerHTML = '<strong>Name required:</strong> Please enter your full name or entity name.';
+      }
+      return;
+    }
+
     if (phoneInput) {
       const cleanPhone = phoneInput.value.replace(/[^0-9+]/g, '');
       if (cleanPhone.length < 10) {
         phoneInput.focus();
         if (statusMsg) {
           statusMsg.className = 'form-feedback-pill error';
-          statusMsg.innerHTML = '<strong>Invalid Telephone:</strong> Please enter a valid telephone or mobile number with country code.';
+          statusMsg.innerHTML = '<strong>Telephone required:</strong> Please enter a valid telephone or mobile number with country code.';
         }
         return;
       }
     }
 
-    const btn = form.querySelector('.btn-submit-appointment');
-    if (!btn) return;
-
-    const domainSelect = document.getElementById('client-forum');
-    const venueSelect = document.getElementById('client-venue');
-    const domainText = domainSelect && domainSelect.selectedIndex > 0 ? domainSelect.options[domainSelect.selectedIndex].text : 'Commercial Litigation & Injunctions';
-    const venueText = venueSelect && venueSelect.selectedIndex >= 0 ? venueSelect.options[venueSelect.selectedIndex].text : 'Gurugram Corporate Chambers';
-
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span>Conducting Conflict Clearance &amp; Transmitting...</span>';
-    btn.disabled = true;
-
-    // Simulated verified intake transmission
-    setTimeout(() => {
-      const refCode = 'MA-2026-' + Math.floor(1000 + Math.random() * 9000);
-      btn.innerHTML = '<span>Chambers Request Registered</span>';
-      
+    if (!emailInput || !emailInput.value.includes('@')) {
+      if (emailInput) emailInput.focus();
       if (statusMsg) {
-        statusMsg.className = 'form-feedback-pill success';
-        statusMsg.innerHTML = `
-          <strong>Chambers Registry Notice:</strong> Matter File Reference <strong>#${refCode}</strong> generated.<br />
-          <strong>Domain:</strong> ${domainText} · <strong>Venue:</strong> ${venueText}<br />
-          Counsel is conducting preliminary conflict clearance. Our office will initiate direct contact within 4 business hours.
+        statusMsg.className = 'form-feedback-pill error';
+        statusMsg.innerHTML = '<strong>Email required:</strong> Please enter a valid email address for confidential correspondence.';
+      }
+      return;
+    }
+
+    const submitBtn = document.getElementById('mcq-submit-btn');
+    const originalText = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.innerHTML = '<span>Verifying conflict status &amp; submitting...</span>';
+      submitBtn.disabled = true;
+    }
+
+    // Retrieve selected MCQ values
+    const selectedDomain = (form.querySelector('input[name="practice_domain"]:checked') || {}).value || 'Commercial litigation & arbitration';
+    const selectedStage = (form.querySelector('input[name="matter_stage"]:checked') || {}).value || 'Urgent interim relief needed';
+    const selectedVenue = (form.querySelector('input[name="consultation_venue"]:checked') || {}).value || 'Delhi litigation chambers';
+    const clientName = nameInput.value.trim();
+
+    setTimeout(() => {
+      const refCode = 'MA-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+
+      if (summaryBox) {
+        summaryBox.innerHTML = `
+          <div class="mcq-summary-item">
+            <span class="mcq-summary-lbl">Reference</span>
+            <span class="mcq-summary-val">#${refCode}</span>
+          </div>
+          <div class="mcq-summary-item">
+            <span class="mcq-summary-lbl">Instructing party</span>
+            <span class="mcq-summary-val">${clientName}</span>
+          </div>
+          <div class="mcq-summary-item">
+            <span class="mcq-summary-lbl">Practice domain</span>
+            <span class="mcq-summary-val">${selectedDomain}</span>
+          </div>
+          <div class="mcq-summary-item">
+            <span class="mcq-summary-lbl">Matter stage</span>
+            <span class="mcq-summary-val">${selectedStage}</span>
+          </div>
+          <div class="mcq-summary-item">
+            <span class="mcq-summary-lbl">Chambers venue</span>
+            <span class="mcq-summary-val">${selectedVenue}</span>
+          </div>
         `;
       }
-      form.reset();
 
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-      }, 7000);
-    }, 850);
+      if (submitBtn) {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+
+      showStep(5);
+    }, 600);
   });
+
+  // Handle Reset button
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      form.reset();
+      if (statusMsg) {
+        statusMsg.className = 'form-feedback-pill';
+        statusMsg.innerHTML = '';
+      }
+      showStep(1);
+    });
+  }
+
+  showStep(1);
 }
 
 /**
