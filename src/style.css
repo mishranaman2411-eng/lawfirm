@@ -828,9 +828,9 @@ button {
 }
 
 .preloader-brand {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: clamp(0.85rem, 1.2vw, 1.05rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.28em;
   color: #211D19;
   text-transform: uppercase;
@@ -911,20 +911,21 @@ button {
 }
 
 .preloader-number {
-  font-family: var(--font-serif);
-  font-size: clamp(4.8rem, 11vw, 8.5rem);
-  font-weight: 500;
+  font-family: var(--font-display);
+  font-size: clamp(5.2rem, 12vw, 9rem);
+  font-weight: 800;
   color: #211D19;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
 }
 
 .preloader-unit {
-  font-family: var(--font-serif);
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  font-weight: 300;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 700;
   color: #C5A059;
   margin-left: 0.35rem;
+  letter-spacing: -0.02em;
 }
 
 /* Status Ticker */
